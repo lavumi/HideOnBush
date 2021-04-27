@@ -11,6 +11,7 @@ export default class Player{
 
     joinRoom ( roomName ){
         this.currentGame = roomName;
+        this.socket.join( roomName );
     }
     getRoom(){
         return this.currentGame;

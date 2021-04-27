@@ -1,3 +1,5 @@
+
+let fastTest = false;
 let inputField = document.getElementById('inputField');
 function addConsole( text ){
     document.getElementById("consolebody").innerText += "\n" + text;
@@ -9,25 +11,32 @@ function defaultEvent( ev ){
     }
 }
 
-function getInput( descText , callback ){
+function getInput( descText , callback , _fastTest ){
     addConsole( descText );
     inputField.onkeyup = function(ev){
         if ( ev.keyCode === 13 && inputField.value.length > 0 ){
+            inputField.onkeyup = defaultEvent;
             addConsole(">"+ inputField.value);
             callback( inputField.value );   
             inputField.value = "";
-            inputField.onkeyup = defaultEvent;
         }
+    }
+    if ( _fastTest === true ){        
+        inputField.onkeyup = defaultEvent;
+        addConsole(">"+ "lavumi");
+        callback( "lavumi");   
+        inputField.value = "";
     }
 }
 
+let waitingInterval = -1;
 function waiting( waitingText ){
     inputField.disabled = true;
 
     // let currentValue = inputField.value;
     let count = 0;
     inputField.value = waitingText;
-    setInterval( function(){
+    waitingInterval = setInterval( function(){
         let string = waitingText;
         count++;
         for( let i = 0 ; i < count % 3 ; i ++){
@@ -35,7 +44,13 @@ function waiting( waitingText ){
         }
 
         inputField.value = string;
-    }, 500);string
+    }, 500);
+}
+
+function stopWaiting(){
+    clearInterval( waitingInterval );
+    inputField.disabled = false;
+    inputField.value = "";
 }
 
 class Socket{
@@ -45,17 +60,20 @@ class Socket{
         this.socket = socket;
 
         let self = this;        
-        this.socket.once("connect", () => {
-            console.log("connected");
+        this.socket.once("connect", ( res ) => {
+            console.log("connected", res );
             self.connected = true;
             addConsole("Welcome"  );
-            // addConsole('Connected to game Server');
-            self.joinRoom( function(){});
+
+            self.joinRoom( );
+            
         });
 
         this.socket.once("disconnect", () => {
             self.connected = false;
             delete this.socket;
+            addConsole("Disconnected");
+            stopWaiting();
         });
 
         this.socket.once("connect_error", (err) => {
@@ -69,32 +87,59 @@ class Socket{
         });
     }
 
-    joinRoom (  cb ){
+    joinRoom ( ){
 
-        getInput( 'Input Room Name' , function(roomName ){
+        getInput( 'Enter Room Name' , function(roomName ){
             if ( this.connected === false ) return;
 
+            let self = this;
             this.socket.emit("join room", roomName , (res )=>{
+                if ( res.response === false ){
+                    addConsole( roomName + " is not available");
+                    self.joinRoom( );
+                    return;
+                }
                 addConsole( "joined "+ roomName);
                 waiting( 'Waiting Other Players');
+
                 this.socket.on('new player' , ( res ) =>{
                     addConsole(res.name + " join room") ;
-                    console.log( res );
                     // console.log( 'new player join room , ', res );
      
                 });
 
                 this.socket.on('gameStart', (res) => {
                     console.log('get gameStartEvent', res);
+                    addConsole("---------  GAME START ---------");
+                    addConsole( "Check card : " + res.data[0] + ", " + res.data[1] );
+                    stopWaiting();
                 })
                 
                 this.socket.on('startTurn', (res) => {
                     console.log("start My turn, turncount = ", res);
+                    addConsole("Its your turn");
+                    addConsole("You checked " + res[0] + " " +res[1]);
+
+                    function checkSuspect(){
+                        getInput("select suspect 4,5,6" , function( input ){
+                            let inputNum = Number(input);
+                            if ( inputNum === 4 || inputNum === 5 || inputNum === 6){
+                                console.log("emit pickSuspect");
+                                self.socket.emit("pickSuspect" , inputNum );
+                            }
+                            else {
+                                checkSuspect();
+                            }
+                        })
+                    }
+                    checkSuspect();
                 });
 
-                cb( res );
+                this.socket.on('gameFinished' , ( res )=>{
+                    
+                })
             });
-        }.bind(this))
+        }.bind(this), fastTest);
 
     }
 
@@ -115,13 +160,15 @@ class Socket{
 }
 
 
-getInput("Input Your Name", function( input ){
+getInput("Enter Your Name", function( input ){
     const socket = io({
+        reconnection : false,
         auth :{
             username : input
-        }
+        },
     });
     
     new Socket( socket );
-})
+}, fastTest );
+
 

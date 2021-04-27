@@ -1,33 +1,48 @@
+import Player from "./Player";
+
 export default class Room {
     io;
-    members = [];
+    members : Player[] = [];
     roomName : string;
     cards = [0,1,2,3,4,5,6,7];
 
     crimeScene = [];
     currentTurn : number;
     picked = [];
+    gameStart = false;
 
     constructor( io ,roomName : string ){
         this.io = io;
         this.roomName = roomName;
     }
 
-
-
-    enterRoom (  socket ){
-
-        this.members.push( socket );
-        if ( this.members.length === 4 ){
-            this.startGame();
-        }
+    checkAvailable(){
+        if ( this.members.length >=4  || this.gameStart === true )
+         return false;
         return true;
     }
 
-    leaveRoom( socket ){
+    getCurrentMember(){
+        let res = [];
+        for( let i = 0 ; i < this.members.length ; i ++ ){
+            res.push( this.members[i].userName );
+        }
+        return res;
+    }
+
+    enterRoom (  player : Player ){
+        this.members.push( player );
+        player.joinRoom( this.roomName );
+        if ( this.members.length === 4 ){
+            this.startGame();
+        }
+        return
+    }
+
+    leaveRoom( player : Player ){
         let leave = false;
         for( let i = 0 ; i < this.members.length ; i ++ ){
-            if ( this.members[i].id === socket.id ){
+            if ( this.members[i].socket.id === player.socket.id ){
                 this.members.splice( i , 1);
                 leave = true;
                 break;
@@ -43,20 +58,20 @@ export default class Room {
 
     startGame(){
         //shuffle
-
+        this.gameStart = true;
         this.currentTurn = 0;
         this.crimeScene.length =0;
         
-        this.members[0].emit('gameStart' , {
+        this.members[0].socket.emit('gameStart' , {
             data : this.cards.slice(0 , 2 )
         });
-        this.members[1].emit('gameStart' , {
-            data : this.cards.slice(1 , 2 )
+        this.members[1].socket.emit('gameStart' , {
+            data : this.cards.slice(1 , 3 )
         });
-        this.members[2].emit('gameStart' , {
-            data : this.cards.slice(2 , 2 )
+        this.members[2].socket.emit('gameStart' , {
+            data : this.cards.slice(2 , 4 )
         });
-        this.members[3].emit('gameStart' , {
+        this.members[3].socket.emit('gameStart' , {
             data : [ this.cards[3], this.cards[0]]
         });
 
@@ -79,7 +94,8 @@ export default class Room {
             }
         }
 
-        this.members[index].emit('startTurn' , [ this.cards[index1] , this.cards[index2] ]);
+        this.members[index].socket.emit('startTurn' , [ this.cards[index1] , this.cards[index2] ]);
+        this.members[index].socket.once('pickSuspect' , this.pickSuspect.bind(this));
     }
 
     /**
@@ -96,6 +112,7 @@ export default class Room {
     }
 
     pickSuspect( index ){
+        console.log( index );
         if ( index > 3 || index < 7){
             this.picked.push( index );
             this.io.to(this.roomName).emit("suspectChoosed" , this.picked);
@@ -110,6 +127,6 @@ export default class Room {
     }
 
     endGame(){
-        this.io.to(this.roomName).emit("gameFinished" , this.cards);
+        this.io.to(this.roomName).emit("gameFinished" , {cards : this.cards , picks : this.picked });
     }
 }

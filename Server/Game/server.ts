@@ -3,7 +3,6 @@ import * as crypto from "crypto";
 import Player from "./Player";
 import GameRoom from "./GameRoom";
 
-
 const randomId = () => crypto.randomBytes(8).toString("hex");
 class GameServer{
     userList : { [name:string] : Player } = {};
@@ -12,6 +11,7 @@ class GameServer{
     socket : Server = null!;
 
     constructor ( listenServer ){
+        let self = this;
         this.socket = new Server().listen(  listenServer );
 
         this.socket.use(( socket, next)=>{
@@ -21,9 +21,9 @@ class GameServer{
               return next(new Error("invalid username"));
             }
         
-            if ( !!this.userList[ username ]){
-                return next(new Error("duplicate login"));
-            }
+            // if ( !!this.userList[ username ]){
+            //     return next(new Error("duplicate login"));
+            // }
             // socket.username = username;
             let player = new Player( socket, username );
             this.userList[ socket.id ] = player;
@@ -31,53 +31,9 @@ class GameServer{
             next();
         })
         
-        this.socket.on("connect", (socket) => {
-            socket.on("join room" , (roomName :string , cb:(res:boolean)=>void )=>{
-                if ( typeof roomName === 'string'){
-                    socket.join( roomName );
-                    if ( !this.roomList[ roomName ] ){
-                        this.roomList[roomName] = new GameRoom( this.socket, roomName);
-                    }
-                    let res = this.roomList[roomName].enterRoom( socket );
-                    if ( res === true  ){
-                        this.userList[socket.id].joinRoom( roomName );
-                    }
-                    //todo 여기서 현재 방에 입장해 있는 사람 리스트도 줘야함
-                    cb(res);
-                }
-        
-            });
-        
-            socket.on('leave room' , (cb : (res : boolean)=>void) =>{
-                let res = leaveRoom.bind(this, socket);
-                cb( res);
-        
-            })
-        
-            socket.on("disconnect", () => {
-                leaveRoom.bind(this, socket);
-                delete this.userList[socket.id] ;
-                // console.log(`disconnect ${socket.id}`);
-            });
+        this.socket.on("connect", socket => {
+            this.addSocketEvent(socket);
         });
-        
-        
-        function leaveRoom( socket ){
-            let roomName = this.userList[socket.id].getRoom();
-            if ( roomName ){
-                let room = this.roomList[roomName];
-                if ( !!room ){
-                    let remains = room.leaveRoom(  socket );
-                    if ( remains === 0 ){
-                        delete this.roomList[ roomName ];
-                    }
-                    return true;
-                }
-            }
-        
-            return false;
-        }
-        
         
         this.socket.of("/").adapter.on("create-room", (room) => {
             // console.log(`room ${room} was created`);
@@ -92,6 +48,64 @@ class GameServer{
             }
         
         });
+    }
+
+
+    addSocketEvent( socket ){
+        socket.on("join room" , (roomName :string , cb:(res:any)=>void )=>{
+            if ( typeof roomName === 'string'){
+                
+                if ( !this.roomList[ roomName ] ){
+                    this.roomList[roomName] = new GameRoom( this.socket, roomName);
+                }
+
+                let able = this.roomList[roomName].checkAvailable();
+                let roomMember = this.roomList[roomName].getCurrentMember();
+                if ( able ){
+                    cb({
+                        response : able,
+                        member : roomMember
+                    });
+                    this.roomList[roomName].enterRoom( this.userList[socket.id] );
+                }
+                
+
+            }
+            cb({
+                response : false
+            })
+    
+        });
+    
+        socket.on('leave room' , (cb : (res : boolean)=>void) =>{
+            let res = this.leaveRoom(socket);
+            cb( res);
+    
+        })
+    
+        socket.on("disconnect", () => {
+            this.leaveRoom(socket);
+            delete this.userList[socket.id] ;
+            console.log(`disconnect ${socket.id}`);
+        });
+    }
+
+    leaveRoom( socket ){
+        let player = this.userList[socket.id];
+        let roomName = player.getRoom();
+        if ( roomName ){
+            let room = this.roomList[roomName];
+            if ( !!room ){
+                let remains = room.leaveRoom(  player );
+                console.log("leave room ", remains);
+                if ( remains === 0 ){
+                    delete this.roomList[ roomName ];
+                }
+                return true;
+            }
+        }
+    
+        return false;
     }
 }
 

@@ -15,7 +15,6 @@ class App{
             this.port = port;
         }
 
-        // this.app.listen( this.port , ()=>{ console.log( "server listen : ", this.port );});
         this.app.get("/",(req : express.Request , res : express.Response) =>{
             res.render('index.html')
         });
