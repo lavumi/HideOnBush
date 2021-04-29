@@ -4,12 +4,19 @@ export default class Room {
     io;
     members : Player[] = [];
     roomName : string;
-    cards = [0,1,2,3,4,5,6,7];
+    cards = [0,2,3,4,5,6,7,8];
 
-    crimeScene = [];
-    currentTurn : number;
+    joker = 5;
+
+    firstTurn : number;
+    currentStage : number;
+
     picked = [];
     gameStart = false;
+
+
+    point = [];
+
 
     constructor( io ,roomName : string ){
         this.io = io;
@@ -34,6 +41,7 @@ export default class Room {
         this.members.push( player );
         player.joinRoom( this.roomName );
         if ( this.members.length === 4 ){
+            this.firstTurn = 0;
             this.startGame();
         }
         return
@@ -59,8 +67,9 @@ export default class Room {
     startGame(){
         //shuffle
         this.gameStart = true;
-        this.currentTurn = 0;
-        this.crimeScene.length =0;
+
+        this.currentStage = 0;
+
         
         this.members[0].socket.emit('gameStart' , {
             data : this.cards.slice(0 , 2 )
@@ -75,17 +84,20 @@ export default class Room {
             data : [ this.cards[3], this.cards[0]]
         });
 
-        this.startTurn(this.currentTurn++);
-        
+        this.startTurn(this.currentStage);
+        this.markCard(4);
     }
 
 
-    startTurn( index ){
+    startTurn( memberIndex : number ){
         //볼 카드 2장
+        let index = (memberIndex + this.firstTurn ) % 4;
+
         let index1 = 4;
         let index2 = 5;
         if ( this.picked.length > 0 ){
-            let lastPick = this.picked[ this.picked.length - 1] ;
+            let lastPick = this.picked[ this.picked.length - 1].voted ;
+            console.log("start turn -- lastpick : ", lastPick , 4,5);
             if ( lastPick === 4 ){
                 index1 = 6;
             }
@@ -94,6 +106,7 @@ export default class Room {
             }
         }
 
+        console.log( index1, index2 );
         this.members[index].socket.emit('startTurn' , [ this.cards[index1] , this.cards[index2] ]);
         this.members[index].socket.once('pickSuspect' , this.pickSuspect.bind(this));
     }
@@ -108,16 +121,20 @@ export default class Room {
             this.cards[index] = this.cards[6];
             this.cards[6] = temp;
         }
-        this.picked.push( index );
+        this.picked.push( {voter : -1 , voted: index} );
     }
 
     pickSuspect( index ){
-        console.log( index );
         if ( index > 3 || index < 7){
-            this.picked.push( index );
+            this.picked.push( { 
+                voter : (this.currentStage + this.firstTurn ) % 4 ,
+                voted : index
+             } );
             this.io.to(this.roomName).emit("suspectChoosed" , this.picked);
-            if ( this.currentTurn < 4)
-                this.startTurn( this.currentTurn++ );
+            this.currentStage++;
+            if ( this.currentStage < 4)
+
+                this.startTurn(this.currentStage);
             else {
                 this.endGame();
             }
@@ -126,7 +143,47 @@ export default class Room {
         return -1;
     }
 
+
     endGame(){
-        this.io.to(this.roomName).emit("gameFinished" , {cards : this.cards , picks : this.picked });
+
+
+
+        let jokerIndex = this.cards.indexOf( this.joker );
+        let killer = -1;
+        if ( jokerIndex >=4 && jokerIndex <= 6 ){
+            killer = Math.min( this.cards[4],this.cards[5],this.cards[6]);
+        }
+        else {
+            killer = Math.max( this.cards[4],this.cards[5],this.cards[6]);
+        }
+        let killerIndex = this.cards.indexOf(killer);
+        let vote = [{ score : 0 , index : -1} , { score : 0 , index : -1},{ score : 0 , index : -1}]
+
+        for ( let i = 1 ; i < this.picked.length ; i ++ ){
+            if ( this.picked[i] === killerIndex )
+                continue;
+
+            if ( this.picked[i].voted === 4 ){
+                vote[0].score++;
+                vote[0].index = this.picked[i].voter;
+            }
+            if ( this.picked[i].voted === 5 ){
+                vote[1].score++;
+                vote[1].index = this.picked[i].voter;
+            }
+            if ( this.picked[i].voted === 6 ){
+                vote[2].score++;
+                vote[2].index = this.picked[i].voter;
+            }
+        }
+
+
+        this.io.to(this.roomName).emit("gameFinished" , { 
+            cards : this.cards , 
+            picks : this.picked, 
+            vote : vote
+        });
+
+        this.firstTurn = (this.firstTurn + 1) % 4;
     }
 }

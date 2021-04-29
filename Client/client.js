@@ -1,5 +1,5 @@
 
-let fastTest = false;
+let fastTest = true;
 let inputField = document.getElementById('inputField');
 function addConsole( text ){
     document.getElementById("consolebody").innerText += "\n" + text;
@@ -135,8 +135,12 @@ class Socket{
                     checkSuspect();
                 });
 
+                this.socket.on("suspectChoosed" , (res)=>{
+                    console.log("suspectChoosed" , res );
+                })
+
                 this.socket.on('gameFinished' , ( res )=>{
-                    
+                    console.log("gameFinished", res );
                 })
             });
         }.bind(this), fastTest);
