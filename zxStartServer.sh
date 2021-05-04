@@ -1,1 +1,1 @@
-npx ts-node Server/app.ts
+npx ts-node app.ts

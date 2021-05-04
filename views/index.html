@@ -1,0 +1,16 @@
+<html>
+  <head>
+    <title>Main</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body> 
+    <div class="canvas"><canvas></canvas></div>
+    <div class="console" id="consolebody">Initializing Game</div>
+    <div class="console" id="inputField">><input id = "inputField" type="text" id="name" name="name" autofocus></div>
+  </body>
+  <script src="/socket.io/socket.io.js"></script>
+  <script type="text/javascript" src="./console_utils.js"></script>
+  <script type="module" src="./render/font-webgl.js"></script>
+  <script type="module" src="./client.js"> </script>
+  <script type="module" src="./gameMain.js"></script>
+</html>
