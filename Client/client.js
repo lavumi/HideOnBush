@@ -54,7 +54,6 @@ class Socket{
                 });
 
                 this.socket.on('gameStart', (res) => {
-                    console.log('get gameStartEvent', res);
                     addConsole("---------  GAME START ---------");
                     addConsole( "Check card : " + res.data[0] + ", " + res.data[1] );
                     stopWaiting();
@@ -107,5 +106,3 @@ class Socket{
         this.socket.on( route , cb );
     }
 }
-
-export default Socket;

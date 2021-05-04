@@ -1,16 +1,27 @@
+<!DOCTYPE HTML>
 <html>
-  <head>
-    <title>Main</title>
-    <link rel="stylesheet" href="style.css" />
-  </head>
-  <body> 
-    <div class="canvas"><canvas></canvas></div>
-    <div class="console" id="consolebody">Initializing Game</div>
-    <div class="console" id="inputField">><input id = "inputField" type="text" id="name" name="name" autofocus></div>
-  </body>
-  <script src="/socket.io/socket.io.js"></script>
-  <script type="text/javascript" src="./console_utils.js"></script>
-  <script type="module" src="./render/font-webgl.js"></script>
-  <script type="module" src="./client.js"> </script>
-  <script type="module" src="./gameMain.js"></script>
+<meta charset="UTF-8" name="viewport" content="width=device-width,user-scalable=no">
+<title>Ninon ZZhang</title>
+<link rel="stylesheet" href="style.css" />
+
+
+<body>
+<div class="canvas"><canvas id = "canvas"></canvas></div>
+<div class="console" > <div id="consolebody" >Initializing Game</div> <div>><input id = "inputField" type="text" id="name" name="name" autofocus></div></div>
+  
+<script src="/socket.io/socket.io.js"></script>
+<script src="client.js"></script>
+<script src="./render/spine-webgl.min.js"></script>
+<script src="./render/shader.js"></script>
+<script src="./render/sprite-webgl.js"></script>
+<script src="./render/spineLoad.js"></script>
+<script src="./render/font-webgl.js"></script>
+<script src="./console_utils.js"></script>
+<script src="./gameMain.js"></script>
+
+<script>
+
+</script>
+</body>
+
 </html>

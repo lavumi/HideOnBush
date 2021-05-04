@@ -1,4 +1,4 @@
-var SpineManager = function () {
+var Spine = function () {
 
     var shader;
     var batcher;
@@ -7,7 +7,7 @@ var SpineManager = function () {
     var debugRenderer;
     var debugShader;
     var shapes;
-    window.skeleton = {};
+    var mySkeleton = {};
     var activeSkeleton = "";
 
     var movement = 1;
@@ -160,11 +160,10 @@ var SpineManager = function () {
                 if (!success) return loading = false;
                 var img = new Image();
                 img.onload = function () {
-
-                    var created = !!window.skeleton.skeleton;
+                    var created = !!mySkeleton.skeleton;
                     if (created) {
-                        window.skeleton.state.clearTracks();
-                        window.skeleton.state.clearListeners();
+                        mySkeleton.state.clearTracks();
+                        mySkeleton.state.clearListeners();
                         gl.deleteTexture(currentTexture.texture)
                     }
 
@@ -254,12 +253,11 @@ var SpineManager = function () {
                         }*/
                     });
 
-                    window.skeleton = { skeleton: skeleton, state: animationState, bounds: bounds, premultipliedAlpha: true }
+                    mySkeleton = { skeleton: skeleton, state: animationState, bounds: bounds, premultipliedAlpha: true }
                     loading = false;
                     //(window.updateUI || setupUI)();
                     if (!created) {
                         canvas.style.width = '99%';
-
                         loadingFinishCallback && loadingFinishCallback();
                         loadingFinishCallback = null;
                         setTimeout(function () {
@@ -291,18 +289,19 @@ var SpineManager = function () {
         return returnName
     }
 
-    var charPos = 0;
-
+    var charPosX = 0;
+    var charPosY = 0;
 
     function spineRender(delta, showDebug) {
-        window.skeleton.skeleton.x = charPos;
+        mySkeleton.skeleton.x = charPosX;
+        mySkeleton.skeleton.y = charPosY;
         // Apply the animation state based on the delta time.
-        var state = window.skeleton.state;
-        var skeleton = window.skeleton.skeleton;
-        var premultipliedAlpha = window.skeleton.premultipliedAlpha;
+        var state = mySkeleton.state;
+        var skeleton = mySkeleton.skeleton;
+        var premultipliedAlpha = mySkeleton.premultipliedAlpha;
         state.update(delta);
         state.apply(skeleton);
-        movementSkeleton(skeleton, movement);
+        setDirection( movement);
         skeleton.updateWorldTransform();
 
         // Bind the shader and set the texture and model-view-projection matrix.
@@ -329,12 +328,12 @@ var SpineManager = function () {
         }
     }
 
-    function movementSkeleton(targetSkeleton, moveX) {
+    function setDirection( moveX) {
         if (moveX < 0) {
-            targetSkeleton.flipX = true;
+            mySkeleton.skeleton.flipX = true;
         }
         else if (moveX > 0) {
-            targetSkeleton.flipX = false;
+            mySkeleton.skeleton.flipX = false;
         }
     }
 
@@ -355,12 +354,12 @@ var SpineManager = function () {
 
 
     function setIdle(){
-        window.skeleton.state.setAnimation(0, getClass(currentClass) + '_idle', true);
+        mySkeleton.state.setAnimation(0, getClass(currentClass) + '_idle', true);
     }
 
-    function setDearIdle(){
-        window.skeleton.state.setAnimation(0, '000000_dear_idol', true);
-        movement = 0.5;
+    function setDearIdle( direction ){
+        mySkeleton.state.setAnimation(0, '000000_dear_idol', true);
+        movement = direction ? direction : 0.5;
     }
 
     function runChar(isLeft ){
@@ -374,7 +373,7 @@ var SpineManager = function () {
             isLoop : true,
             timeScale : 1
         };
-        window.skeleton.state.setAnimation(0, getClass(currentClass) + '_run', true);
+        mySkeleton.state.setAnimation(0, getClass(currentClass) + '_run', true);
        // runAnimation([run]);
     }
     function stopChar(){
@@ -503,7 +502,7 @@ var SpineManager = function () {
 
 
 
-        var AnimEntry = window.skeleton.state.setAnimation(0, firstAction, firstActionObj.isLoop);
+        var AnimEntry = mySkeleton.state.setAnimation(0, firstAction, firstActionObj.isLoop);
         AnimEntry.timeScale = firstActionObj.timeScale;
 
         animArray.forEach( function(i){
@@ -516,8 +515,9 @@ var SpineManager = function () {
         return movement;
     }
 
-    function setPosition( pos ){
-        charPos = pos;
+    function setPosition( posX, posY ){
+        charPosX = posX;
+        charPosY = posY
     }
 
     function getPosition(){
@@ -530,6 +530,7 @@ var SpineManager = function () {
         render    : spineRender,
         setPosition : setPosition,
         getPosition : getPosition,
+        setDirection : setDirection,
 
         setDearIdle : setDearIdle,
         setIdle : setIdle,

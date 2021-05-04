@@ -4,10 +4,14 @@
 }
 
 
-canvas {
-    width : 1920;
+div.canvas {
+    width : 80%;
     height : 1080;
     position: absolute;
+}
+
+#canvas {
+    width : 100%;
 }
 html, body {
     width : 100%;
@@ -19,6 +23,7 @@ html, body {
 
 div.console {
     width:20%;
+    height:100%;
     float:right;
     background-color: #000000;
     color:chartreuse;
@@ -26,10 +31,11 @@ div.console {
 }
 
 #inputField{
+    width : 90%;
     background-color: #000000;
     color:chartreuse;
     font-size: 20;
     border: none;
     outline: none;
-    size: 90%;
+    /* size: 90%; */
 }

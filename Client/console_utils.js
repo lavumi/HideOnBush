@@ -1,5 +1,5 @@
 
-let fastTest = true;
+let fastTest = false;
 let inputField = document.getElementById('inputField');
 function addConsole( text ){
     document.getElementById("consolebody").innerText += "\n" + text;
