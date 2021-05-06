@@ -293,15 +293,19 @@ var Spine = function () {
     var charPosY = 0;
 
     function spineRender(delta, showDebug) {
-        mySkeleton.skeleton.x = charPosX;
-        mySkeleton.skeleton.y = charPosY;
+
         // Apply the animation state based on the delta time.
         var state = mySkeleton.state;
         var skeleton = mySkeleton.skeleton;
         var premultipliedAlpha = mySkeleton.premultipliedAlpha;
+
+
+        skeleton.x = charPosX;
+        skeleton.y = charPosY;
+        skeleton.flipX = movement<0;
+
         state.update(delta);
         state.apply(skeleton);
-        setDirection( movement);
         skeleton.updateWorldTransform();
 
         // Bind the shader and set the texture and model-view-projection matrix.
@@ -328,14 +332,7 @@ var Spine = function () {
         }
     }
 
-    function setDirection( moveX) {
-        if (moveX < 0) {
-            mySkeleton.skeleton.flipX = true;
-        }
-        else if (moveX > 0) {
-            mySkeleton.skeleton.flipX = false;
-        }
-    }
+
 
     function resize( scale ){
 
@@ -346,7 +343,6 @@ var Spine = function () {
 
         mvp.ortho2d(centerX - width / 2, centerY - height / 2, width, height);
     }
-
 
 
 
@@ -523,14 +519,55 @@ var Spine = function () {
     function getPosition(){
         return charPos;
     }
+
+    function setDirection( moveX) {
+        if (moveX < 0) {
+            mySkeleton.skeleton.flipX = true;
+        }
+        else if (moveX > 0) {
+            mySkeleton.skeleton.flipX = false;
+        }
+    }
+
+    let moveDelta = [];
+    let targetPosition = [];
+    let moveTime = 1;
+    function moveTo( time, posX , posY ){
+        moveTime = time;
+        targetPosition= [posX,posY];
+        moveDelta = [posX - charPosX , posY - charPosY];
+        runChar( posX - charPosX < 0);
+    }
+
+    function update( dt ){
+        if ( targetPosition.length === 0 ) return;
+        if ( Math.abs(charPosX - targetPosition[0] ) < 20 && Math.abs(charPosY - targetPosition[1]) < 20 ){
+            charPosX = targetPosition[0];
+            charPosY = targetPosition[1];
+            targetPosition.length = 0;
+            moveDelta.length = 0;
+            setIdle();
+        }
+        else {
+            charPosX += moveDelta[0] * dt / moveTime;
+            charPosY += moveDelta[1] * dt / moveTime;
+        }
+    }
+
     return {
         init : initSpineGL,
         load : loadSpine,
         resize : resize,
         render    : spineRender,
+
+
         setPosition : setPosition,
         getPosition : getPosition,
         setDirection : setDirection,
+        moveTo : moveTo,
+        update : update,
+
+
 
         setDearIdle : setDearIdle,
         setIdle : setIdle,
@@ -538,8 +575,7 @@ var Spine = function () {
         jump : jumpChar,
         damage : damageedChar,
         attackChar : attackChar,
+        die : dieChar,
         getSpeed : getSpeed,
-
-        die : dieChar
     }
 }

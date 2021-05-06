@@ -22,14 +22,31 @@ function GameMain() {
 
     var bgColor = [0, 0.5, 1, 1];
 
-    var characters = [];
+
     //#endregion
 
 
     //#region inGame val
+    var characters = [];
     var characterID = [106011,109631 ,102031,103631, 113431,106131,110531,110931];
     var classID = [7,2,5,7,29,5,2,2];
 
+
+    var initPos = [
+        [-450,150],[-150,150],[150,150],[450,150],
+        [-450,-330],[-150,-330],[150,-330],[450,-330]
+    ];
+
+    var gamePos = [
+        [0,-1000],
+        [1700,0],
+        [0,600],
+        [-1700,0],
+        [-300,-330],
+        [0,-330],
+        [300,-330],
+        [0,150]
+    ];
     //#endregion
 
     function init() {
@@ -58,7 +75,7 @@ function GameMain() {
                 characters[index].load( characterID[index], classID[index] , loadSpineCharacter.bind(null, index+1));
             }
             else {
-                initGame();
+                startGame();
             }
         }
 
@@ -154,52 +171,20 @@ function GameMain() {
         prevTime = Date.now();
     };
 
-    function initGame() {
-        // characters.forEach( element =>{
-        //     element.setIdle();
-        // })
 
-        let length = characters.length;
-
-        // for( let i = 0 ; i < length  ; i ++ ){
-        //     let pos = i  - Math.floor(length /2 ) ;
-        //     characters[i].setPosition( pos *  300 , 0);
-        // }
-
-        characters[0].setPosition(0,-1000);
-        characters[1].setPosition(0,600);
-        characters[2].setPosition(-1700,0);
-        characters[3].setPosition(1700,0);
-        characters[4].setPosition(-300,-330);
-        characters[5].setPosition(0,-330);
-        characters[6].setPosition(300,-330);
-        characters[7].setPosition(0,150);
-        
-
-
-
-
-        characters[0].setDearIdle();
-        characters[1].setDearIdle(-1);
-        characters[2].setDearIdle();
-        characters[3].setDearIdle(-1);
-        characters[4].setIdle();
-        characters[5].setIdle();
-        characters[6].setIdle();
-        characters[7].die();
-
-        requestAnimationFrame(update);
-
-
-
-    }
 
     function update() {
 
         var now = Date.now() / 1000;
         var delta = now - lastFrameTime;
         lastFrameTime = now;
-        // console.log(delta);
+
+
+        // characters[0].update(delta);
+        characters.forEach(element=>{
+            element.update(delta);
+        })
+
         render(delta);
         requestAnimationFrame(update);
 
@@ -284,6 +269,82 @@ function GameMain() {
         gl.viewport(0, 0, canvas.width, canvas.height);
     }
 
+
+    function startGame() {
+
+        // characters[0].setDearIdle();
+        // characters[1].setDearIdle(-1);
+        // characters[2].setDearIdle(-1);
+        // characters[3].setDearIdle();
+        // characters[4].setIdle();
+        // characters[5].setIdle();
+        // characters[6].setIdle();
+        // characters[7].die();
+
+        openSequence1();
+        requestAnimationFrame(update);
+    }
+
+    function openSequence1(){
+        let length = characters.length;
+        for( let i = 0 ; i < length  ; i ++ ){
+            characters[i].setPosition( initPos[i][0] , initPos[i][1]);
+            characters[i].setIdle();
+        }
+
+        setTimeout( openSequence2 , 1000);
+    }
+
+    function openSequence2(){
+        //커튼 치기
+        //여기서 캐릭터 셔플 한번 하면 되럭 같음
+        for( let i = 0 ; i < characters.length ; i ++ ){
+            let rnd = Math.floor(Math.random() * characters.length );
+            console.log("---", rnd);
+            let temp = characters[i];
+            characters[i] = characters[rnd];
+            characters[rnd] = temp;
+        }
+
+        setTimeout( openSequence3 , 1000);
+    }
+
+    function openSequence3(){
+        let length = characters.length;
+        for( let i = 0 ; i < length  ; i ++ ){
+            // characters[i].setPosition( initPos[i][0] , initPos[i][1]);
+            characters[i].moveTo(2, gamePos[i][0] , gamePos[i][1]);
+        }
+
+        setTimeout( openSequence4 , 2000 );
+    }
+
+    function openSequence4(){
+        characters[0].setDearIdle();
+        characters[1].setDearIdle(-1);
+        characters[2].setDearIdle(-1);
+        characters[3].setDearIdle();
+        characters[4].setIdle();
+        characters[5].setIdle();
+        characters[6].setIdle();
+        characters[7].die();
+
+        //커튼 젖히기
+
+
+        setTimeout( openSequence5 , 1000);
+
+    }
+    function openSequence5(){
+
+
+        //메인 게임 시작
+    }
+
+
+
+
+
     return {
         init: init
     }
@@ -293,4 +354,14 @@ function GameMain() {
 var main = new GameMain();
 main.init();
 
+
+
+/**
+ * 게임 플로우
+ * 1. 캐릭터들 중앙에 모여있음
+ * 2. 중앙 부위에 커튼이 쳐짐
+ * 3. 4명의 케릭터가 각각의 위치로 이동
+ * 4. 커튼이 젖혀지면 남은 4명중 1명이 죽어있음
+ * 5. 게임 플레이 로직 시작
+ */
 
