@@ -55,7 +55,7 @@ var shaders = {
             "varying mediump vec2 TexCoords;" +
             "void main() {" +
             "    mediump vec4 sampled = texture2D(texture, TexCoords);" +
-            "    gl_FragColor = vec4(0, 0, 0, sampled.a);"+
+            "    gl_FragColor = vec4(color.r, color.g, color.b, sampled.a);"+
             "}" ,
         attrInfo : ['aVertexPosition', 'uv'],
         uniInfo : ['uVPMatrix','uWorldMatrix', 'texture', 'color']

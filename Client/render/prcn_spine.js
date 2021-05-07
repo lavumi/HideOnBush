@@ -1,6 +1,8 @@
 var Spine = function () {
 
     var shader;
+    var normalShader;
+    var silhouetteShader;
     var batcher;
     var mvp = new spine.webgl.Matrix4();
     var skeletonRenderer;
@@ -54,7 +56,9 @@ var Spine = function () {
     }
 
     function initSpineGL() {
-        shader = spine.webgl.Shader.newTwoColoredTextured(gl);
+        normalShader = spine.webgl.Shader.newTwoColoredTextured(gl);
+        silhouetteShader = spine.webgl.Shader.newSilhouetteTextured(gl);
+        shader = normalShader;
         batcher = new spine.webgl.PolygonBatcher(gl);
         mvp.ortho2d(0, 0, canvas.width - 1, canvas.height - 1);
         skeletonRenderer = new spine.webgl.SkeletonRenderer(gl);
@@ -292,6 +296,19 @@ var Spine = function () {
     var charPosX = 0;
     var charPosY = 0;
 
+
+    var silhouette = false;
+    function swapShader(){
+        if ( silhouette === false ){
+            shader = silhouetteShader;
+            silhouette = true;
+        }
+        else {
+            shader = normalShader;
+            silhouette = false;
+        }
+    }
+
     function spineRender(delta, showDebug) {
 
         // Apply the animation state based on the delta time.
@@ -300,8 +317,8 @@ var Spine = function () {
         var premultipliedAlpha = mySkeleton.premultipliedAlpha;
 
 
-        skeleton.x = charPosX;
-        skeleton.y = charPosY;
+        skeleton.x = charPosX * 2;
+        skeleton.y = charPosY * 2;
         skeleton.flipX = movement<0;
 
         state.update(delta);
@@ -554,12 +571,25 @@ var Spine = function () {
         }
     }
 
+    function getRect(){
+        let width = 180;
+        let height = 230;
+        return {
+            x : charPosX - width/2,
+            y : charPosY ,
+            width : width,
+            height : height
+        }
+    }
+
     return {
         init : initSpineGL,
         load : loadSpine,
         resize : resize,
         render    : spineRender,
 
+        getRect : getRect,
+        swapShader : swapShader,
 
         setPosition : setPosition,
         getPosition : getPosition,

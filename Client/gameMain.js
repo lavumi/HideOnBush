@@ -33,19 +33,19 @@ function GameMain() {
 
 
     var initPos = [
-        [-450,150],[-150,150],[150,150],[450,150],
-        [-450,-330],[-150,-330],[150,-330],[450,-330]
+        [-225,75],[-75,75],[75,75],[225,75],
+        [-225,-165],[-75,-165],[75,-165],[225,-165]
     ];
 
     var gamePos = [
-        [0,-1000],
-        [1700,0],
-        [0,600],
-        [-1700,0],
-        [-300,-330],
-        [0,-330],
-        [300,-330],
-        [0,150]
+        [0,-500],
+        [850,0],
+        [0,300],
+        [-850,0],
+        [-150,-165],
+        [0,-165],
+        [150,-165],
+        [0,75]
     ];
     //#endregion
 
@@ -144,7 +144,10 @@ function GameMain() {
         FontSystem.loadFont();
         // FontSystem.setString("score", "Score : " + 0);
         // FontSystem.setPosition("score", [0, 470]);
-
+        FontSystem.setString("number" , "?");
+        FontSystem.setColor("number", [1,1,1,1]);
+        FontSystem.setPosition("number", [0,0]);
+        FontSystem.setVisible( "number", false);
     }
 
     function getAlpabetFromInput(input) {
@@ -223,11 +226,13 @@ function GameMain() {
         //     SpriteShader.draw();
         // }
 
-        FontSystem.draw();
+
 
         characters.forEach(element=>{
             element.render(delta, false);
-        })
+        });
+
+        FontSystem.draw();
     }
 
     function drawUI() {
@@ -291,7 +296,6 @@ function GameMain() {
             characters[i].setPosition( initPos[i][0] , initPos[i][1]);
             characters[i].setIdle();
         }
-
         setTimeout( openSequence2 , 1000);
     }
 
@@ -300,14 +304,19 @@ function GameMain() {
         //여기서 캐릭터 셔플 한번 하면 되럭 같음
         for( let i = 0 ; i < characters.length ; i ++ ){
             let rnd = Math.floor(Math.random() * characters.length );
-            console.log("---", rnd);
             let temp = characters[i];
             characters[i] = characters[rnd];
             characters[rnd] = temp;
         }
 
+
+
+
         setTimeout( openSequence3 , 1000);
     }
+
+
+
 
     function openSequence3(){
         let length = characters.length;
@@ -332,16 +341,28 @@ function GameMain() {
         //커튼 젖히기
 
 
-        setTimeout( openSequence5 , 1000);
+        setTimeout( openSequence5 , 2000);
 
     }
     function openSequence5(){
-
-
         //메인 게임 시작
+
+        _setMouseEvent( characters[0], 3);
+        _setMouseEvent( characters[3], 6);
     }
 
+    function _setMouseEvent(targetCharacter , number ){
+        RegistMouseDownEvent(targetCharacter , 
+            function(){
+                FontSystem.toggle("number" );
+                FontSystem.setString("number", number.toString());
+                let rect = targetCharacter.getRect();
 
+                FontSystem.setPosition("number" , [ rect.x + 80, rect.y + 100]);
+                targetCharacter.swapShader();
+            }
+        );
+    }
 
 
 
@@ -364,4 +385,3 @@ main.init();
  * 4. 커튼이 젖혀지면 남은 4명중 1명이 죽어있음
  * 5. 게임 플레이 로직 시작
  */
-

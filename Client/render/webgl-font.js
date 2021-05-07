@@ -9,6 +9,7 @@
                     position: null,
                     uv: null,
                     indices: null,
+                    color : [0,0,0,1]
                 },
                 vertexCount: 0,
                 dirty : true,
@@ -23,7 +24,8 @@
                 buffer: {
                     position: null,
                     uv: null,
-                    indices: null,
+                    indices: null,                        
+                    color : [0,0,0,1]
                 },
                 vertexCount: 0,
                 dirty : true,
@@ -270,6 +272,15 @@
                 shaderData.attribLocations['uv']);
         }
 
+
+        if (shaderData.uniformLocations.hasOwnProperty('color')) {
+
+            gl.uniform4fv(
+                shaderData.uniformLocations['color'],
+                buffer.color);
+        }
+
+
         gl.uniformMatrix4fv(
             shaderData.uniformLocations['uVPMatrix'],
             false,
@@ -337,6 +348,7 @@
                         position: null,
                         uv: null,
                         indices: null,
+                        color : [0,0,0,1]
                     },
                     vertexCount: 0,
                     dirty : true,
@@ -352,6 +364,11 @@
         }
     }
 
+    function _toggle(labelName ){
+        if( !!LabelData[ labelName ] === true ){
+            LabelData[ labelName ].renderData.visible = !LabelData[ labelName ].renderData.visible;
+        }
+    }
 
     function _setPosition( labelName , position ){
         if( !!LabelData[ labelName ] === true )
@@ -361,12 +378,25 @@
         }
     }
 
+    function _setColor( labelName , color ){
+        if( !!LabelData[ labelName ] === true ){
+            LabelData[ labelName ].renderData.buffer.color = color;
+            LabelData[ labelName ].renderData.dirty = true;
+        }
+        else{
+            console.log( 'No Label : ' + labelName);
+        }
+    }
+
     return {
         loadFont: loadFont,
         
+
+        toggle : _toggle,
         setVisible : _setVisible,
         setString: _setString,
         setPosition : _setPosition,
+        setColor : _setColor,
         draw: _draw,
     }
     })();
