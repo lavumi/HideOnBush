@@ -1,6 +1,4 @@
 
-// mouseX 및 mouseY는 캔버스에 상대적인 CSS 표시 공간에 있습니다.
-
 
 let checkMouseDown = [];
 
@@ -47,3 +45,86 @@ canvas.addEventListener('mouseup' , (e) => {
         closeCurrentOpen();
 });
 
+let keyMap = {};
+document.addEventListener('keydown', function (event) {
+
+    if (keyMap[event.code] === true) return;
+
+    // if(event.code === 'ArrowRight' ){
+    //     runChar( false);
+    // }
+    // else if (event.code === 'ArrowLeft'){
+    //     runChar( true);
+    // }
+    if (event.code === 'KeyA') {
+        //sendScore(score);
+
+    }
+    // else if (event.code === 'KeyS'){
+    //     attack2Char();
+    // }
+
+    // else if (event.code === 'KeyQ'){
+    //     dieChar( );
+    // }
+    // else if (event.code === 'KeyW'){
+    //     damageedChar();
+    // }
+
+    // else if (event.code === 'KeyZ'){
+    //     useSkill( 0);
+    // }
+    // else if (event.code === 'KeyX'){
+    //     useSkill( 1);
+    // }
+    // else if (event.code === 'KeyC'){
+    //     useSkill( 2);
+    // }
+
+    if (event.code === 'Space') {
+        event.preventDefault();
+
+    }
+
+    keyMap[event.code] = true;
+
+}, false);
+
+document.addEventListener('keyup', function (event) {
+    // console.log('webgl-input.js(94) :', 'keyup', event );
+    keyMap[event.code] = false;
+    if ( inputMode === true ){
+        inputTarget.updateUI( getAlpabetFromInput(event.code));
+        return;
+    }
+
+}, false);
+
+
+function getAlpabetFromInput(input) {
+    if (input.indexOf('Key') !== -1) {
+        return input.replace('Key', "");
+    }
+    else if ( input.indexOf("Enter") !== -1 ){
+        return "ET";
+    }
+    else if ( input.indexOf("Backspace") !== -1 ) {
+        return "BS";
+    }
+    else {
+        return null;
+    }
+}
+
+
+let inputMode = false;
+let inputTarget = null;
+function changeToInputMode( _inputTarget){
+    inputTarget = _inputTarget;
+    inputMode = true;
+}
+
+function finishInputMode(){
+    inputMode = false;
+    inputTarget = null;
+}

@@ -1,5 +1,9 @@
 var Spine = function () {
 
+    var _isVisible = true;
+
+
+
     var shader;
     var normalShader;
     var silhouetteShader;
@@ -106,7 +110,7 @@ var Spine = function () {
         var baseId = loadingSkeleton.baseId;
 
         if (!generalBattleSkeletonData[baseId])
-            loadData('prcn_data/' + baseId + '_CHARA_BASE.cysp', function (success, data) {
+            loadData('images/' + baseId + '_CHARA_BASE.cysp', function (success, data) {
                 if (!success || data === null) return loading = false;
                 generalBattleSkeletonData[baseId] = data;
                 loadAdditionAnimation();
@@ -119,7 +123,7 @@ var Spine = function () {
         generalAdditionAnimations[baseId] = generalAdditionAnimations[baseId] || {};
         additionAnimations.forEach(function (i) {
             if (generalAdditionAnimations[baseId][i]) return doneCount++;
-            loadData('prcn_data/' + baseId + '_' + i + '.cysp', function (success, data) {
+            loadData('images/' + baseId + '_' + i + '.cysp', function (success, data) {
                 if (!success || data == null) return abort = true;
 
                 if (abort) return;
@@ -133,7 +137,7 @@ var Spine = function () {
         if (currentClassAnimData.type == currentClass)
             loadCharaSkillAnimation();
         else
-            loadData('prcn_data/' + getClass(currentClass) + '_COMMON_BATTLE.cysp', function (success, data) {
+            loadData('images/' + getClass(currentClass) + '_COMMON_BATTLE.cysp', function (success, data) {
                 if (!success || data === null) return loading = false;
                 currentClassAnimData = {
                     type: currentClass,
@@ -148,7 +152,7 @@ var Spine = function () {
         if (currentCharaAnimData.id == baseUnitId)
             loadTexture();
         else
-            loadData('prcn_data/' + baseUnitId + '_BATTLE.cysp', function (success, data) {
+            loadData('images/' + baseUnitId + '_BATTLE.cysp', function (success, data) {
                 if (!success || data === null) return loading = false;
                 currentCharaAnimData = {
                     id: baseUnitId,
@@ -158,9 +162,9 @@ var Spine = function () {
             }, 'arraybuffer');
     }
     function loadTexture() {
-        loadData('prcn_data/' + loadingSkeleton.id + '.atlas', function (success, atlasText) {
+        loadData('images/' + loadingSkeleton.id + '.atlas', function (success, atlasText) {
             if (!success) return loading = false;//
-            loadData('prcn_data/' + loadingSkeleton.id + '.png', function (success, blob) {
+            loadData('images/' + loadingSkeleton.id + '.png', function (success, blob) {
                 if (!success) return loading = false;
                 var img = new Image();
                 img.onload = function () {
@@ -310,6 +314,9 @@ var Spine = function () {
     }
 
     function spineRender(delta, showDebug) {
+
+
+        if ( _isVisible === false ) return;
 
         // Apply the animation state based on the delta time.
         var state = mySkeleton.state;
@@ -582,6 +589,10 @@ var Spine = function () {
         }
     }
 
+    function setVisible( _visible ){
+        _isVisible = _visible;
+    }
+
     return {
         init : initSpineGL,
         load : loadSpine,
@@ -590,6 +601,7 @@ var Spine = function () {
 
         getRect : getRect,
         swapShader : swapShader,
+        setVisible : setVisible,
 
         setPosition : setPosition,
         getPosition : getPosition,

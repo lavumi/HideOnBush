@@ -1,12 +1,12 @@
 var TextureUtil = {
 
     textureList : [
-        'prcn_data/109631.png',
-        'prcn_data/ground2.png',
-        'prcn_data/tree.png',
-        'prcn_data/bg.png',
-        'prcn_data/obstacle.png',
-        'prcn_data/optionUI.png'
+        // 'prcn_data/109631.png',
+        // 'prcn_data/ground2.png',
+        // 'prcn_data/tree.png',
+        // 'prcn_data/bg.png',
+        // 'prcn_data/obstacle.png',
+        'images/optionUI.png'
     ],
 
     _glTexture : {},
@@ -65,7 +65,7 @@ var TextureUtil = {
     },
 
     getTexture : function( textureName ){
-        return this._glTexture["prcn_data/"+textureName];
+        return this._glTexture["images/"+textureName];
     }
 };
 

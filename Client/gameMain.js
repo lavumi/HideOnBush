@@ -59,9 +59,8 @@ function GameMain() {
         }
 
 
-        initInput();
         initFont();
-
+        initUI();
         for( let i = 0 ; i < characterID.length ; i ++ ){
             let character = new Spine();
             characters.push( character );
@@ -73,6 +72,7 @@ function GameMain() {
         function loadSpineCharacter( index ){
             if ( index < characters.length  ){
                 characters[index].load( characterID[index], classID[index] , loadSpineCharacter.bind(null, index+1));
+                characters[index].setVisible(false);
             }
             else {
                 startGame();
@@ -86,78 +86,28 @@ function GameMain() {
 
     }
 
-    function initInput() {
-        keyMap = {};
-        document.addEventListener('keydown', function (event) {
-            return;
-
-
-            if (keyMap[event.code] === true) return;
-
-            // if(event.code === 'ArrowRight' ){
-            //     runChar( false);
-            // }
-            // else if (event.code === 'ArrowLeft'){
-            //     runChar( true);
-            // }
-            if (event.code === 'KeyA') {
-                //sendScore(score);
-
-            }
-            // else if (event.code === 'KeyS'){
-            //     attack2Char();
-            // }
-
-            // else if (event.code === 'KeyQ'){
-            //     dieChar( );
-            // }
-            // else if (event.code === 'KeyW'){
-            //     damageedChar();
-            // }
-
-            // else if (event.code === 'KeyZ'){
-            //     useSkill( 0);
-            // }
-            // else if (event.code === 'KeyX'){
-            //     useSkill( 1);
-            // }
-            // else if (event.code === 'KeyC'){
-            //     useSkill( 2);
-            // }
-
-            if (event.code === 'Space') {
-                event.preventDefault();
-
-            }
-
-            keyMap[event.code] = true;
-
-        }, false);
-
-        document.addEventListener('keyup', function (event) {
-            keyMap[event.code] = false;
-
-        }, false);
-    }
 
     function initFont(){
         FontSystem.loadFont();
-        // FontSystem.setString("score", "Score : " + 0);
-        // FontSystem.setPosition("score", [0, 470]);
         FontSystem.setString("number" , "?");
         FontSystem.setColor("number", [1,1,1,1]);
         FontSystem.setPosition("number", [0,0]);
         FontSystem.setVisible( "number", false);
+
+
+
+
     }
 
-    function getAlpabetFromInput(input) {
-        if (input.indexOf('Key') !== -1) {
-            return input.replace('Key', "");
-        }
-        else {
-            return null;
-        }
+    function initUI(){
+        FontSystem.setString("UITitle" , "Input Your Name");
+        FontSystem.setPosition("UITitle", [-200,140]);
+
+        FontSystem.setString("inputText" , "_");
+        FontSystem.setPosition("inputText", [-200,0]);
     }
+
+
 
     var prevTime = 0;
     function printDeltaTime() {
@@ -175,6 +125,76 @@ function GameMain() {
     };
 
 
+
+    function showInputUI(){
+
+        let _string = "";
+        function inputField(){
+
+            function _updateUI( string ){
+                
+                if ( string === null ){
+                    
+                }
+                else if ( string === "ET"){
+                    const socket = io({
+                        reconnection : false,
+                        auth :{
+                            username : input
+                        },
+                    });
+                    new Socket( socket );
+                }
+                else if ( string === "BS"){
+                    _string = _string.substr(0, _string.length -1);
+                }
+                else if ( string.length === 1){
+                    _string = _string + string;
+                }
+
+  
+                FontSystem.setString("inputText", _string);
+            }
+
+            return{
+                updateUI : _updateUI
+            }
+        }
+        changeToInputMode( inputField() );
+    }
+
+    function showInputUI2(){
+
+
+        FontSystem.setString("UITitle", "Input RoomCode")
+        let _string = "";
+        function inputField(){
+
+            function _updateUI( string ){
+                
+                if ( string === null ){
+                    
+                }
+                else if ( string === "ET"){
+
+                }
+                else if ( string === "BS"){
+                    _string = _string.substr(0, _string.length -1);
+                }
+                else if ( string.length === 1){
+                    _string = _string + string;
+                }
+
+  
+                FontSystem.setString("inputText", _string);
+            }
+
+            return{
+                updateUI : _updateUI
+            }
+        }
+        // changeToInputMode( inputField() );
+    }
 
     function update() {
 
@@ -201,32 +221,7 @@ function GameMain() {
         resize();
 
 
-        // SpriteShader.bind();
-        // SpriteShader.setTexture("bg.png");
-        // for (var i = 0; i < 4; i++) {
-        //     SpriteShader.setAttr(farBgPos[i]);
-        //     SpriteShader.draw();
-        // }
-
-        // SpriteShader.setTexture("ground2.png");
-        // for (var i = 0; i < 6; i++) {
-        //     SpriteShader.setAttr(nearBgPos[i], 0.5);
-        //     SpriteShader.draw();
-        // }
-
-        // SpriteShader.setTexture("tree.png");
-        // for (var i = 0; i < 6; i++) {
-        //     SpriteShader.setAttr(nearBgPos[i]);
-        //     SpriteShader.draw();
-        // }
-
-        // SpriteShader.setTexture("obstacle.png");
-        // for (var i = 0; i < obstaclePos.length; i++) {
-        //     SpriteShader.setAttr(obstaclePos[i]);
-        //     SpriteShader.draw();
-        // }
-
-
+        drawUI();
 
         characters.forEach(element=>{
             element.render(delta, false);
@@ -235,14 +230,17 @@ function GameMain() {
         FontSystem.draw();
     }
 
-    function drawUI() {
-
+    function drawUI( uiType ) {
+        SpriteShader.bind();
         SpriteShader.setTexture("optionUI.png");
         SpriteShader.setAttr([-256, -256]);
         SpriteShader.draw();
 
-        FontSystem.setVisible("Ranktxt", true);
-        FontSystem.setVisible("MyNAME", true);
+        FontSystem.setVisible("UITitle", true);
+        FontSystem.setVisible("inputText", true);
+
+
+
     };
 
     function resize() {
@@ -286,8 +284,11 @@ function GameMain() {
         // characters[6].setIdle();
         // characters[7].die();
 
-        openSequence1();
         requestAnimationFrame(update);
+
+        showInputUI( 0 );
+        // openSequence1();
+
     }
 
     function openSequence1(){
@@ -298,7 +299,6 @@ function GameMain() {
         }
         setTimeout( openSequence2 , 1000);
     }
-
     function openSequence2(){
         //커튼 치기
         //여기서 캐릭터 셔플 한번 하면 되럭 같음
@@ -314,10 +314,6 @@ function GameMain() {
 
         setTimeout( openSequence3 , 1000);
     }
-
-
-
-
     function openSequence3(){
         let length = characters.length;
         for( let i = 0 ; i < length  ; i ++ ){
@@ -327,11 +323,10 @@ function GameMain() {
 
         setTimeout( openSequence4 , 2000 );
     }
-
     function openSequence4(){
-        characters[0].setDearIdle();
+        characters[0].setDearIdle(-1);
         characters[1].setDearIdle(-1);
-        characters[2].setDearIdle(-1);
+        characters[2].setDearIdle();
         characters[3].setDearIdle();
         characters[4].setIdle();
         characters[5].setIdle();
