@@ -65,20 +65,20 @@ function GameMain() {
             return;
         }
 
-        FontSystem.loadFont( function(){
+        tt.FontSystem.initialize( function(){
             TextureUtil.loadTexture(function () {
                 InitCharacter();
-                initInputScene();
-                initUI();
+                // initInputScene();
+                // initUI();
+                
             });}
         );
     }
 
     function InitCharacter(){
-
         function loadSpineCharacter( index ){
             if ( index < characters.length  ){
-                characters[index].load( characterID[index], classID[index] , loadSpineCharacter.bind(null, index+1));
+                characters[index].loadCharacter( characterID[index], classID[index] , loadSpineCharacter.bind(null, index+1));
                 // characters[index].setVisible(false);
             }
             else {
@@ -87,9 +87,10 @@ function GameMain() {
         }
 
         for( let i = 0 ; i < characterID.length ; i ++ ){
-            let character = new Spine();
+            // let character = new Spine();
+            let character = new tt.Princess();
             characters.push( character );
-            character.init();
+            character.initialize();
         }
         loadSpineCharacter(0);
     };
@@ -115,6 +116,14 @@ function GameMain() {
         uiInput.setPosition([-200,0]);
         currentScene.addChild( uiInput );
 
+        uiInput.setEnterCallback( function(input ){
+            if ( input.length !== 0 ){
+                openSequence1();
+            }
+
+
+        })
+
     }
 
     function update() {
@@ -124,9 +133,8 @@ function GameMain() {
         lastFrameTime = now;
 
 
-        // characters[0].update(delta);
         characters.forEach(element=>{
-            element.update(delta);
+            element._update(delta);
         })
 
         render(delta);
@@ -141,12 +149,11 @@ function GameMain() {
 
         resize();
 
-        currentScene.render();
+        // currentScene.render();
 
-        // characters.forEach(element=>{
-        //     element.render(delta, false);
-        // });
-        FontSystem.draw();
+        characters.forEach(element=>{
+            element.render(delta, false);
+        });
     }
 
     function resize() {
@@ -180,27 +187,14 @@ function GameMain() {
 
 
     function startGame() {
-
-        // characters[0].setDearIdle();
-        // characters[1].setDearIdle(-1);
-        // characters[2].setDearIdle(-1);
-        // characters[3].setDearIdle();
-        // characters[4].setIdle();
-        // characters[5].setIdle();
-        // characters[6].setIdle();
-        // characters[7].die();
-
         requestAnimationFrame(update);
-
-        // showInputUI( 0 );
         openSequence1();
-
     }
 
     function openSequence1(){
         let length = characters.length;
         for( let i = 0 ; i < length  ; i ++ ){
-            characters[i].setPosition( initPos[i][0] , initPos[i][1]);
+            characters[i].setPosition( initPos[i]);
             characters[i].setIdle();
         }
         setTimeout( openSequence2 , 1000);
@@ -255,11 +249,9 @@ function GameMain() {
     function _setMouseEvent(targetCharacter , number ){
         RegistMouseDownEvent(targetCharacter , 
             function(){
-                FontSystem.toggle("number" );
-                FontSystem.setString("number", number.toString());
                 let rect = targetCharacter.getRect();
 
-                FontSystem.setPosition("number" , [ rect.x + 80, rect.y + 100]);
+                // FontSystem.setPosition("number" , [ rect.x + 80, rect.y + 100]);
                 targetCharacter.swapShader();
             }
         );

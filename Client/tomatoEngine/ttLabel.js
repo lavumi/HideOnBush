@@ -21,7 +21,7 @@ class FontBufferBuilder {
 
         //console.log( string + " make buffer!!");
 
-        let allFontData = FontSystem.getFontData();
+        let allFontData = tt.FontSystem.getFontData();
         var fontStartPos = [0, 0];
         this.vertexCount = 0;
         for (var i = 0; i < text.length; i++) {
@@ -30,7 +30,7 @@ class FontBufferBuilder {
                 fontStartPos[0] += 30 / 512;
                 continue;
             }
-            var fontData = allFontData[text[i]];;
+            var fontData = allFontData[text[i].toLowerCase()];;
 
             var X = fontData.rect[0] / 512;
             var Y = fontData.rect[1] / 512;
@@ -125,7 +125,7 @@ class FontBufferBuilder {
     }
 
     render(){
-        FontSystem.render( this.buffer , this.vertexCount);
+        tt.FontSystem.render( this.buffer , this.vertexCount);
     }
 
 }

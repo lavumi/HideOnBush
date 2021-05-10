@@ -32,7 +32,10 @@ tt.Node = class {
         });
     }
 
-    update(){
-
+    update( dt ){
+        this._update(dt);
+        this.children.forEach( element =>{
+            element._update(dt);
+        });
     }
 }

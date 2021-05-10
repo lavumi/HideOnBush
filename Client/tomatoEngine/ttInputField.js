@@ -5,6 +5,8 @@ tt.InputField = class InputField extends tt.Node {
 
     buffer = null;
 
+    enterCallback = null;
+
     constructor( ){
         super();
         this.buffer = new FontBufferBuilder();
@@ -28,10 +30,12 @@ tt.InputField = class InputField extends tt.Node {
         if (event.code === 'Space')
         event.preventDefault();
         // keyMap[event.code] = true;
+
+        this._updateUI( event.code );
     }
 
     _keyupEvent( event ){
-        this._updateUI( event.code );
+        // this._updateUI( event.code );
     }
 
 
@@ -44,7 +48,10 @@ tt.InputField = class InputField extends tt.Node {
             this._setString(this.text + character);
         }
         else if ( input.indexOf("Enter") !== -1 ){
-            console.log("Enter PRessed");
+            // console.log("Enter PRessed");
+            if ( typeof enterCallback === "function" ){
+                this.enterCallback( this.text);
+            }
         }
         else if ( input.indexOf("Backspace") !== -1 ) {
             this._setString(this.text .substr(0, this.text .length -1) );
@@ -67,5 +74,10 @@ tt.InputField = class InputField extends tt.Node {
 
     _render(){
         this.buffer.render();
+    }
+
+
+    setEnterCallback( callback ){
+        this.enterCallback = callback;
     }
 }
