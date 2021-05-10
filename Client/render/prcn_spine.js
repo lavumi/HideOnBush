@@ -265,12 +265,8 @@ var Spine = function () {
                     loading = false;
                     //(window.updateUI || setupUI)();
                     if (!created) {
-                        canvas.style.width = '99%';
                         loadingFinishCallback && loadingFinishCallback();
                         loadingFinishCallback = null;
-                        setTimeout(function () {
-                            canvas.style.width = '';
-                        }, 0)
                     }
                     activeSkeleton = loadingSkeleton.id;
                 }
