@@ -49,7 +49,7 @@
 
     var myFontData = {};
     var fontAtlas = null;
-    function loadFont() {
+    function loadFont( callback ) {
         function loadDoc() {
             var req = new XMLHttpRequest();
             req.onreadystatechange = function () {
@@ -80,14 +80,14 @@
 
             }
 
-            _loadFontAtlas('myFont');
+            _loadFontAtlas('myFont' , callback );
         }
 
         loadDoc();
     };
 
     var loadfinished = false;
-    function _loadFontAtlas(atlas) {
+    function _loadFontAtlas(atlas , callback ) {
         var texture = gl.createTexture();
         var image = new Image();
 
@@ -100,8 +100,8 @@
             gl.bindTexture(gl.TEXTURE_2D, null);
             fontAtlas = texture;
             _loadShader();
-        // _makeBuffer('sampleText');
             loadfinished = true;
+            callback();
         };
 
         image.onerror = function (e) {
@@ -124,8 +124,6 @@
 
 
     //#endregion
-
-
 
     ////#region 개별 데이터 세팅
     function _makeBuffer( labelName ) {
@@ -388,9 +386,98 @@
         }
     }
 
+
+
+    function _bindBuffer( buffer ){
+        gl.bindBuffer(gl.ARRAY_BUFFER, buffer.vertex);
+        gl.vertexAttribPointer(
+            shaderData.attribLocations['aVertexPosition'],
+            3, // position x, y, z 3개
+            gl.FLOAT,
+            false,
+            0,
+            0);
+        gl.enableVertexAttribArray(
+            shaderData.attribLocations['aVertexPosition']);
+
+
+        if (shaderData.attribLocations.hasOwnProperty('uv')) {
+
+            gl.bindBuffer(gl.ARRAY_BUFFER, buffer.uv);
+            gl.vertexAttribPointer(
+                shaderData.attribLocations['uv'],
+                2,
+                gl.FLOAT,
+                true,
+                0,
+                0);
+
+            gl.enableVertexAttribArray(
+                shaderData.attribLocations['uv']);
+        }
+
+
+        if (shaderData.uniformLocations.hasOwnProperty('color')) {
+
+            gl.uniform4fv(
+                shaderData.uniformLocations['color'],
+                buffer.color);
+        }
+
+
+        gl.uniformMatrix4fv(
+            shaderData.uniformLocations['uVPMatrix'],
+            false,
+            [2, 0, 0, 0,
+                0, 2, 0, 0,
+                0, 0, 1, 0,
+                0, 0, 0, 1]);
+
+
+        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, buffer.indices);
+        gl.enable(gl.BLEND);
+        gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+
+
+        var x = buffer.position[0];
+        var y = buffer.position[1];
+
+        var width = 512 / ScreenSize[0];
+        var height = 512 / ScreenSize[1];
+
+        var position = {
+            x: x / ScreenSize[0],
+            y: y / ScreenSize[1],
+        };
+
+        gl.uniformMatrix4fv(
+            shaderData.uniformLocations['uWorldMatrix'],
+            false,
+            [width, 0, 0, 0,
+                0, height, 0, 0,
+                0, 0, 1, 0,
+                position.x, position.y, 0, 1]);
+    }
+
+
+
+
+
+
+    function _getFontData(){
+        return myFontData;
+    }
+
+    function _render (  buffer, vertexCount ){
+        gl.useProgram(shaderData.program);
+        _setFont();
+        _bindBuffer( buffer );
+        gl.drawElements(gl.TRIANGLES, vertexCount, gl.UNSIGNED_SHORT, 0);
+    }
+
+
     return {
         loadFont: loadFont,
-        
 
         toggle : _toggle,
         setVisible : _setVisible,
@@ -398,6 +485,11 @@
         setPosition : _setPosition,
         setColor : _setColor,
         draw: _draw,
+
+
+
+        getFontData : _getFontData,
+        render : _render
     }
     })();
 

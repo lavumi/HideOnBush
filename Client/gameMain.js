@@ -2,17 +2,18 @@ var canvas;
 var gl;
 var ScreenSize = [1920, 1080];
 
-(function(){
-    getInput("Enter Your Name", function( input ){
-        const socket = io({
-            reconnection : false,
-            auth :{
-                username : input
-            },
-        });
-        new Socket( socket );
-    }, fastTest );
-})();
+// (function(){
+//     getInput("Enter Your Name", function( input ){
+//         const socket = io({
+//             reconnection : false,
+//             auth :{
+//                 username : input
+//             },
+//         });
+//         new Socket( socket );
+//     }, fastTest );
+// })();
+
 
 
 function GameMain() {
@@ -23,12 +24,18 @@ function GameMain() {
     var bgColor = [0, 0.5, 1, 1];
 
 
+
+    let currentScene;
+
+    let uiFrame;
+    let uiTitle;
+    let uiInput;
     //#endregion
 
 
     //#region inGame val
     var characters = [];
-    var characterID = [106011,109631 ,102031,103631, 113431,106131,110531,110931];
+    var characterID = [ 106011,109631 ,102031,103631, 113431,106131,110531,110931];
     var classID = [7,2,5,7,29,5,2,2];
 
 
@@ -58,142 +65,56 @@ function GameMain() {
             return;
         }
 
+        FontSystem.loadFont( function(){
+            TextureUtil.loadTexture(function () {
+                InitCharacter();
+                initInputScene();
+                initUI();
+            });}
+        );
+    }
 
-        initFont();
-        initUI();
-        for( let i = 0 ; i < characterID.length ; i ++ ){
-            let character = new Spine();
-            characters.push( character );
-            character.init();
-        }
-
-
+    function InitCharacter(){
 
         function loadSpineCharacter( index ){
             if ( index < characters.length  ){
                 characters[index].load( characterID[index], classID[index] , loadSpineCharacter.bind(null, index+1));
-                characters[index].setVisible(false);
+                // characters[index].setVisible(false);
             }
             else {
                 startGame();
             }
         }
 
-        TextureUtil.loadTexture(function () {
-            loadSpineCharacter(0);
-        })
-
-
-    }
-
-
-    function initFont(){
-        FontSystem.loadFont();
-        FontSystem.setString("number" , "?");
-        FontSystem.setColor("number", [1,1,1,1]);
-        FontSystem.setPosition("number", [0,0]);
-        FontSystem.setVisible( "number", false);
-
-
-
-
-    }
-
-    function initUI(){
-        FontSystem.setString("UITitle" , "Input Your Name");
-        FontSystem.setPosition("UITitle", [-200,140]);
-
-        FontSystem.setString("inputText" , "_");
-        FontSystem.setPosition("inputText", [-200,0]);
-    }
-
-
-
-    var prevTime = 0;
-    function printDeltaTime() {
-        if ((Date.now() - prevTime) > 33) {
-            var currentdate = new Date();
-            var datetime = "Last Sync: "
-                + currentdate.getHours() + ":"
-                + currentdate.getMinutes() + ":"
-                + currentdate.getSeconds();
-
-            console.log(" 1 " + (Date.now() - prevTime) + " ++++ " + datetime);
-
+        for( let i = 0 ; i < characterID.length ; i ++ ){
+            let character = new Spine();
+            characters.push( character );
+            character.init();
         }
-        prevTime = Date.now();
+        loadSpineCharacter(0);
     };
 
 
 
-    function showInputUI(){
-
-        let _string = "";
-        function inputField(){
-
-            function _updateUI( string ){
-                
-                if ( string === null ){
-                    
-                }
-                else if ( string === "ET"){
-                    const socket = io({
-                        reconnection : false,
-                        auth :{
-                            username : input
-                        },
-                    });
-                    new Socket( socket );
-                }
-                else if ( string === "BS"){
-                    _string = _string.substr(0, _string.length -1);
-                }
-                else if ( string.length === 1){
-                    _string = _string + string;
-                }
-
-  
-                FontSystem.setString("inputText", _string);
-            }
-
-            return{
-                updateUI : _updateUI
-            }
-        }
-        changeToInputMode( inputField() );
+    function initInputScene(){
+        currentScene = new tt.Node();
     }
 
-    function showInputUI2(){
+    function initUI(){
 
+        uiFrame = new tt.Sprite("optionUI.png");
+        uiFrame.setPosition([-256, -256]);
+        currentScene.addChild( uiFrame);
 
-        FontSystem.setString("UITitle", "Input RoomCode")
-        let _string = "";
-        function inputField(){
+        uiTitle = new tt.Label("Input Your Name");
+        uiTitle.setPosition([-200,140]);
+        currentScene.addChild( uiTitle );
 
-            function _updateUI( string ){
-                
-                if ( string === null ){
-                    
-                }
-                else if ( string === "ET"){
+        uiInput = new tt.InputField();
+        uiInput.enable( true );
+        uiInput.setPosition([-200,0]);
+        currentScene.addChild( uiInput );
 
-                }
-                else if ( string === "BS"){
-                    _string = _string.substr(0, _string.length -1);
-                }
-                else if ( string.length === 1){
-                    _string = _string + string;
-                }
-
-  
-                FontSystem.setString("inputText", _string);
-            }
-
-            return{
-                updateUI : _updateUI
-            }
-        }
-        // changeToInputMode( inputField() );
     }
 
     function update() {
@@ -220,28 +141,13 @@ function GameMain() {
 
         resize();
 
+        currentScene.render();
 
-        drawUI();
-
-        characters.forEach(element=>{
-            element.render(delta, false);
-        });
-
+        // characters.forEach(element=>{
+        //     element.render(delta, false);
+        // });
         FontSystem.draw();
     }
-
-    function drawUI( uiType ) {
-        SpriteShader.bind();
-        SpriteShader.setTexture("optionUI.png");
-        SpriteShader.setAttr([-256, -256]);
-        SpriteShader.draw();
-
-        FontSystem.setVisible("UITitle", true);
-        FontSystem.setVisible("inputText", true);
-
-
-
-    };
 
     function resize() {
 
@@ -286,8 +192,8 @@ function GameMain() {
 
         requestAnimationFrame(update);
 
-        showInputUI( 0 );
-        // openSequence1();
+        // showInputUI( 0 );
+        openSequence1();
 
     }
 
