@@ -27,9 +27,9 @@ function GameMain() {
 
     let currentScene;
 
-    let uiFrame;
-    let uiTitle;
-    let uiInput;
+    // let uiFrame;
+    // let uiTitle;
+    // let uiInput;
     //#endregion
 
 
@@ -67,10 +67,9 @@ function GameMain() {
 
         tt.FontSystem.initialize( function(){
             TextureUtil.loadTexture(function () {
-                InitCharacter();
-                // initInputScene();
-                // initUI();
-                
+                // InitCharacter();
+                // initInputScene();    
+                currentScene = new GameScene( startGame );            
             });}
         );
     }
@@ -98,33 +97,17 @@ function GameMain() {
 
 
     function initInputScene(){
-        currentScene = new tt.Node();
-    }
-
-    function initUI(){
-
-        uiFrame = new tt.Sprite("optionUI.png");
-        uiFrame.setPosition([-256, -256]);
-        currentScene.addChild( uiFrame);
-
-        uiTitle = new tt.Label("Input Your Name");
-        uiTitle.setPosition([-200,140]);
-        currentScene.addChild( uiTitle );
-
-        uiInput = new tt.InputField();
-        uiInput.enable( true );
-        uiInput.setPosition([-200,0]);
-        currentScene.addChild( uiInput );
-
-        uiInput.setEnterCallback( function(input ){
-            if ( input.length !== 0 ){
-                openSequence1();
-            }
-
-
+        currentScene = new InputScene();
+        currentScene.setInputCallback( function(){
+            InitGameScene();
         })
-
     }
+
+    function InitGameScene(){
+        // delete currentScene;
+        currentScene = new GameScene();
+    }
+
 
     function update() {
 
@@ -132,10 +115,7 @@ function GameMain() {
         var delta = now - lastFrameTime;
         lastFrameTime = now;
 
-
-        characters.forEach(element=>{
-            element._update(delta);
-        })
+        currentScene.update( delta );
 
         render(delta);
         requestAnimationFrame(update);
@@ -149,11 +129,11 @@ function GameMain() {
 
         resize();
 
-        // currentScene.render();
+        currentScene.render();
 
-        characters.forEach(element=>{
-            element.render(delta, false);
-        });
+        // characters.forEach(element=>{
+        //     element.render(delta, false);
+        // });
     }
 
     function resize() {
@@ -177,9 +157,7 @@ function GameMain() {
         }
 
 
-        characters.forEach(element=>{
-            element.resize(scale);
-        })
+        currentScene.resize(scale);
 
 
         gl.viewport(0, 0, canvas.width, canvas.height);
@@ -188,73 +166,7 @@ function GameMain() {
 
     function startGame() {
         requestAnimationFrame(update);
-        openSequence1();
-    }
-
-    function openSequence1(){
-        let length = characters.length;
-        for( let i = 0 ; i < length  ; i ++ ){
-            characters[i].setPosition( initPos[i]);
-            characters[i].setIdle();
-        }
-        setTimeout( openSequence2 , 1000);
-    }
-    function openSequence2(){
-        //커튼 치기
-        //여기서 캐릭터 셔플 한번 하면 되럭 같음
-        for( let i = 0 ; i < characters.length ; i ++ ){
-            let rnd = Math.floor(Math.random() * characters.length );
-            let temp = characters[i];
-            characters[i] = characters[rnd];
-            characters[rnd] = temp;
-        }
-
-
-
-
-        setTimeout( openSequence3 , 1000);
-    }
-    function openSequence3(){
-        let length = characters.length;
-        for( let i = 0 ; i < length  ; i ++ ){
-            // characters[i].setPosition( initPos[i][0] , initPos[i][1]);
-            characters[i].moveTo(2, gamePos[i][0] , gamePos[i][1]);
-        }
-
-        setTimeout( openSequence4 , 2000 );
-    }
-    function openSequence4(){
-        characters[0].setDearIdle(-1);
-        characters[1].setDearIdle(-1);
-        characters[2].setDearIdle();
-        characters[3].setDearIdle();
-        characters[4].setIdle();
-        characters[5].setIdle();
-        characters[6].setIdle();
-        characters[7].die();
-
-        //커튼 젖히기
-
-
-        setTimeout( openSequence5 , 2000);
-
-    }
-    function openSequence5(){
-        //메인 게임 시작
-
-        _setMouseEvent( characters[0], 3);
-        _setMouseEvent( characters[3], 6);
-    }
-
-    function _setMouseEvent(targetCharacter , number ){
-        RegistMouseDownEvent(targetCharacter , 
-            function(){
-                let rect = targetCharacter.getRect();
-
-                // FontSystem.setPosition("number" , [ rect.x + 80, rect.y + 100]);
-                targetCharacter.swapShader();
-            }
-        );
+        // openSequence1();
     }
 
 

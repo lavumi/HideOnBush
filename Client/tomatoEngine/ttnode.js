@@ -20,6 +20,9 @@ tt.Node = class {
         this.children.push(child);
     }
 
+    _update(dt){
+        
+    }
 
     _render(){
         
