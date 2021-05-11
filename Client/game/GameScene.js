@@ -1,5 +1,5 @@
 class GameScene extends tt.Node{
-    characters = [];
+
     characterID = [ 106011,109631 ,102031,103631, 113431,106131,110531,110931];
     classID = [7,2,5,7,29,5,2,2];
 
@@ -19,11 +19,17 @@ class GameScene extends tt.Node{
         [0,75]
     ];
 
+
+    numberOffset = [ 80 , 100 ];
+
+    lbNums = [];
+    characters = [];
+    bush;
     _loadFinishCallback;
     constructor( loadFinishCallback ){
         super();
         this._loadFinishCallback = loadFinishCallback;
-        this.InitCharacter();
+        this.InitializeScene();
     }
 
 
@@ -33,7 +39,11 @@ class GameScene extends tt.Node{
         })
     }
 
-    InitCharacter(){
+    InitializeScene(){
+
+
+
+
         for( let i = 0 ; i < this.characterID.length ; i ++ ){
             // let character = new Spine();
             let character = new tt.Princess();
@@ -41,6 +51,12 @@ class GameScene extends tt.Node{
             character.initialize();
             this.addChild( character );
         }
+        this.bush = new tt.Sprite("bush.png");
+        this.bush.setPosition([-256, -256]);
+        this.bush.setVisible( false );
+        this.addChild( this.bush );
+
+
         this._loadSpineCharacter(0);
     }
 
@@ -67,6 +83,8 @@ class GameScene extends tt.Node{
     }
     _openSequence2(){
         //커튼 치기
+        this.bush.setVisible(true);        
+
         //여기서 캐릭터 셔플 한번 하면 되럭 같음
         for( let i = 0 ; i < this.characters.length ; i ++ ){
             let rnd = Math.floor(Math.random() * this.characters.length );
@@ -102,18 +120,41 @@ class GameScene extends tt.Node{
 
     }
     _openSequence5(){
+        this.bush.setVisible( false );
         //메인 게임 시작
         function _setMouseEvent(targetCharacter , number ){
-            RegistMouseDownEvent(targetCharacter , 
+            tt.InputManager.registerMouseDownEvent(targetCharacter , 
                 function(){
-                    let rect = targetCharacter.getRect();
-                    // FontSystem.setPosition("number" , [ rect.x + 80, rect.y + 100]);
+
                     targetCharacter.swapShader();
                 }
             );
         }
 
-        _setMouseEvent( this.characters[0], 3);
-        _setMouseEvent( this.characters[3], 6);
+        this.setFirstNumbers( 3,6);
+
+        // _setMouseEvent( this.characters[0], 3);
+        // _setMouseEvent( this.characters[3], 6);
+    }
+
+
+    _addLabelToCharacter( targetCharacter, num ){
+        let lb = new tt.Label(num.toString());
+        let rect = targetCharacter.getRect();
+        lb.setPosition([ rect.x + 80, rect.y + 100]);
+        lb.setVisible( false );
+        lb.setColor([1,1,1,1]);
+        targetCharacter.addChild( lb );
+
+        tt.InputManager.registerMouseDownEvent( targetCharacter , function(){
+            targetCharacter.swapShader();
+            lb.setVisible( !lb.getVisible());
+        });
+    }
+
+
+    setFirstNumbers( num1, num2 ){
+        this._addLabelToCharacter( this.characters[0],num1);
+        this._addLabelToCharacter( this.characters[3],num2);
     }
 }

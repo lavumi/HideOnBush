@@ -6,7 +6,8 @@ var TextureUtil = {
         // 'prcn_data/tree.png',
         // 'prcn_data/bg.png',
         // 'prcn_data/obstacle.png',
-        'images/optionUI.png'
+        'images/optionUI.png',
+        'images/bush.png'
     ],
 
     _glTexture : {},
@@ -214,7 +215,7 @@ var SpriteShader = (function(){
         if( scale=== undefined ){
             scale = scale = 1;
         }
-
+        let ScreenSize = tt.gameEngine.getInstance().getScreenSize();
 
         var width = textureSize.width / ScreenSize[0] * scale  ;
         var height = textureSize.height / ScreenSize[1] * scale ;

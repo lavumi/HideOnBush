@@ -95,6 +95,7 @@ class FontRenderer  {
     //#endregion
 
     _bindBuffer( buffer ){
+        let ScreenSize = tt.gameEngine.getInstance().getScreenSize();
         gl.bindBuffer(gl.ARRAY_BUFFER, buffer.vertex);
         gl.vertexAttribPointer(
             this.shaderData.attribLocations['aVertexPosition'],

@@ -21,7 +21,7 @@ class FontBufferBuilder {
 
         //console.log( string + " make buffer!!");
 
-        let allFontData = tt.FontSystem.getFontData();
+        let allFontData = tt.FontRenderer.getFontData();
         var fontStartPos = [0, 0];
         this.vertexCount = 0;
         for (var i = 0; i < text.length; i++) {
@@ -120,12 +120,16 @@ class FontBufferBuilder {
         this.dirty = false;
     }
 
+    setColor( color ){
+        this.buffer.color = color;
+    }
+
     setPosition( position ){
         this.buffer.position = position;
     }
 
     render(){
-        tt.FontSystem.render( this.buffer , this.vertexCount);
+        tt.FontRenderer.render( this.buffer , this.vertexCount);
     }
 
 }
@@ -137,11 +141,17 @@ tt.Label = class Label extends tt.Node {
 
     buffer = null;
 
-    constructor( text ){
+    constructor( text , color ){
         super();
-        this.text = text;
+        this.text = text ? text : "";
         this.buffer = new FontBufferBuilder();
         this.buffer.makeBuffer( this.text );
+    }
+
+    setColor( color ){
+        if ( color.length === 4 ){
+            this.buffer.setColor( color );
+        }
     }
 
     setString( text ){

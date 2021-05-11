@@ -2,6 +2,7 @@ tt.Node = class {
 
     position = [0,0];
     children = [];
+    visible = true;
 
     constructor(){
         this.position = [0,0];
@@ -28,7 +29,25 @@ tt.Node = class {
         
     }
 
+    setVisible( visible ){
+        this.visible = visible;
+    }
+
+    getVisible(){
+        return this.visible;
+    }
+
+    getRect(){
+        return {
+            x : this.position[0],
+            y : this.position[1] ,
+            width : 0,
+            height : 0,
+        }
+    }
+
     render(){
+        if ( this.visible === false ) return;
         this._render();
         this.children.forEach( element =>{
             element.render();
