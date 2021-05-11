@@ -27,7 +27,7 @@ class FontRenderer  {
                     parse(this);
                 }
             };
-            req.open("GET", "font/myFont.xml", true);
+            req.open("GET", "Resources/font/myFont.xml", true);
             req.send();
         }
 
@@ -77,7 +77,7 @@ class FontRenderer  {
             console.error("image load fail :" + atlas + " error : " + e);
         }
 
-        image.src = 'font/' + atlas + ".png";
+        image.src = 'Resources/font/' + atlas + ".png";
     }
 
     _loadShader() {

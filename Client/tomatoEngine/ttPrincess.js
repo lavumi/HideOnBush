@@ -106,7 +106,7 @@ tt.Princess =  class PRCN_Spine extends tt.Node{
         var baseId = self.loadingSkeleton.baseId;
 
         if (!self.generalBattleSkeletonData[baseId])
-            self._loadData('images/' + baseId + '_CHARA_BASE.cysp', function (success, data) {
+            self._loadData('Resources/prcn/' + baseId + '_CHARA_BASE.cysp', function (success, data) {
                 if (!success || data === null) return self.loading = false;
                 self.generalBattleSkeletonData[baseId] = data;
                 self._loadAdditionAnimation();
@@ -122,7 +122,7 @@ tt.Princess =  class PRCN_Spine extends tt.Node{
         self._additionAnimations.forEach(function (i) {
             if (self.generalAdditionAnimations[baseId][i]) 
                 return doneCount++;
-            self._loadData('images/' + baseId + '_' + i + '.cysp', function (success, data) {
+            self._loadData('Resources/prcn/' + baseId + '_' + i + '.cysp', function (success, data) {
                 if (!success || data == null) return abort = true;
 
                 if (abort) return;
@@ -139,7 +139,7 @@ tt.Princess =  class PRCN_Spine extends tt.Node{
         if (self.currentClassAnimData.type == self.currentClass)
             self._loadCharaSkillAnimation();
         else
-            self._loadData('images/' + self._getClass(self.currentClass) + '_COMMON_BATTLE.cysp', function (success, data) {
+            self._loadData('Resources/prcn/' + self._getClass(self.currentClass) + '_COMMON_BATTLE.cysp', function (success, data) {
                 if (!success || data === null) return loading = false;
                 self.currentClassAnimData = {
                     type: self.currentClass,
@@ -155,7 +155,7 @@ tt.Princess =  class PRCN_Spine extends tt.Node{
         if (self.currentCharaAnimData.id == baseUnitId)
             self._loadTexture();
         else
-        self._loadData('images/' + baseUnitId + '_BATTLE.cysp', function (success, data) {
+        self._loadData('Resources/prcn/' + baseUnitId + '_BATTLE.cysp', function (success, data) {
                 if (!success || data === null) return self.loading = false;
                 self.currentCharaAnimData = {
                     id: baseUnitId,
@@ -166,9 +166,9 @@ tt.Princess =  class PRCN_Spine extends tt.Node{
     }
     _loadTexture() {
         let self = this;
-        self._loadData('images/' + self.loadingSkeleton.id + '.atlas', function (success, atlasText) {
+        self._loadData('Resources/prcn/' + self.loadingSkeleton.id + '.atlas', function (success, atlasText) {
             if (!success) return self.loading = false;//
-            self._loadData('images/' + self.loadingSkeleton.id + '.png', function (success, blob) {
+            self._loadData('Resources/prcn/' + self.loadingSkeleton.id + '.png', function (success, blob) {
                 if (!success) return self.loading = false;
                 var img = new Image();
                 img.onload = function () {

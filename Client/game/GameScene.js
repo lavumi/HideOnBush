@@ -24,7 +24,7 @@ class GameScene extends tt.Node{
 
     lbNums = [];
     characters = [];
-    bush;
+    trees = [];
     _loadFinishCallback;
     constructor( loadFinishCallback ){
         super();
@@ -40,8 +40,37 @@ class GameScene extends tt.Node{
     }
 
     InitializeScene(){
+        // let spr = new tt.Sprite("bg.png");
+        // spr.setPosition([-960, -456]);
+        // this.addChild(spr);
 
 
+        let spr = new tt.Sprite("ground2.png");
+        spr.setPosition([-480, 200]);
+        this.addChild(spr);
+
+        spr = new tt.Sprite("ground2.png");
+        spr.setPosition([480, 200]);
+        this.addChild(spr);
+
+        let bushPos = [
+            [-240   ,  100],
+            [  0   ,   100],
+
+            [ 240   ,  100],
+
+
+            [-320   ,  -50],
+            [ 320   ,  -50],
+        ];
+
+        for(let i = 0 ; i < bushPos.length ; i ++ ){
+            spr = new tt.Sprite("tree.png");
+            spr.setPosition(bushPos[i]);
+            this.addChild(spr);
+            // this.trees.push(spr);
+            // spr.setVisible(false);
+        }
 
 
         for( let i = 0 ; i < this.characterID.length ; i ++ ){
@@ -51,11 +80,24 @@ class GameScene extends tt.Node{
             character.initialize();
             this.addChild( character );
         }
-        this.bush = new tt.Sprite("bush.png");
-        this.bush.setPosition([-256, -256]);
-        this.bush.setVisible( false );
-        this.addChild( this.bush );
 
+
+        bushPos = [
+
+            [-160   ,  -50],
+            [   0   ,  -50],
+            [ 160   ,  -50],
+
+        ];
+
+
+        for(let i = 0 ; i < bushPos.length ; i ++ ){
+            spr = new tt.Sprite("tree.png");
+            spr.setPosition(bushPos[i]);
+            this.addChild(spr);
+            this.trees.push(spr);
+            spr.setVisible(false);
+        }
 
         this._loadSpineCharacter(0);
     }
@@ -83,7 +125,10 @@ class GameScene extends tt.Node{
     }
     _openSequence2(){
         //커튼 치기
-        this.bush.setVisible(true);        
+        this.trees.forEach(element=>{
+            element.setVisible(true);
+        });
+       
 
         //여기서 캐릭터 셔플 한번 하면 되럭 같음
         for( let i = 0 ; i < this.characters.length ; i ++ ){
@@ -120,7 +165,9 @@ class GameScene extends tt.Node{
 
     }
     _openSequence5(){
-        this.bush.setVisible( false );
+        this.trees.forEach(element=>{
+            element.setVisible(false);
+        });
         //메인 게임 시작
         function _setMouseEvent(targetCharacter , number ){
             tt.InputManager.registerMouseDownEvent(targetCharacter , 

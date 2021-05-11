@@ -49,6 +49,7 @@ tt.Node = class {
     render(){
         if ( this.visible === false ) return;
         this._render();
+
         this.children.forEach( element =>{
             element.render();
         });

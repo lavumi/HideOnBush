@@ -6,8 +6,11 @@ var TextureUtil = {
         // 'prcn_data/tree.png',
         // 'prcn_data/bg.png',
         // 'prcn_data/obstacle.png',
-        'images/optionUI.png',
-        'images/bush.png'
+        'Resources/images/tree.png',
+        'Resources/images/ground2.png',
+        'Resources/images/bg.png',
+        'Resources/images/optionUI.png',
+        'Resources/images/bush.png'
     ],
 
     _glTexture : {},
@@ -66,7 +69,7 @@ var TextureUtil = {
     },
 
     getTexture : function( textureName ){
-        return this._glTexture["images/"+textureName];
+        return this._glTexture["Resources/images/"+textureName];
     }
 };
 
@@ -91,11 +94,11 @@ var SpriteShader = (function(){
     
     var makeBuffer = function(){
 
-        var minX = 0;//this._aabbData[0];
-        var minY = 0;//this._aabbData[2];
+        var minX = -0.5;//this._aabbData[0];
+        var minY = -0.5;//this._aabbData[2];
         var minZ = 0;//this._aabbData[4];
-        var maxX = 1;//this._aabbData[1];
-        var maxY = 1;//this._aabbData[3];
+        var maxX = 0.5;//this._aabbData[1];
+        var maxY = 0.5;//this._aabbData[3];
         var maxZ = 0;//this._aabbData[5];
 
         const positions = [
