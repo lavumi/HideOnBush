@@ -56,10 +56,7 @@ class GameScene extends tt.Node{
         let bushPos = [
             [-240   ,  100],
             [  0   ,   100],
-
             [ 240   ,  100],
-
-
             [-320   ,  -50],
             [ 320   ,  -50],
         ];
@@ -84,9 +81,9 @@ class GameScene extends tt.Node{
 
         bushPos = [
 
-            [-160   ,  -50],
-            [   0   ,  -50],
-            [ 160   ,  -50],
+            [-160   ,  -20],
+            [   0   ,  -20],
+            [ 160   ,  -20],
 
         ];
 
@@ -110,18 +107,32 @@ class GameScene extends tt.Node{
         }
         else {
             self._loadFinishCallback();
-            self._openSequence1();
+            // self._openSequence1();
+            self._runSequence();
         }
     }
 
+    _sleep( ms ){
+        return new Promise( resolve => setTimeout( resolve, ms));
+    }
 
+    async _runSequence(){
+        this._openSequence1();
+        await this._sleep( 1000 );
+        this._openSequence2();
+        await this._sleep(1000);
+        this._openSequence4();
+        await this._sleep(1000);
+        this._openSequence5();
+    }
+
+    //#region [ OPENING SEQUENCE ]
     _openSequence1(){
         let length = this.characters.length;
         for( let i = 0 ; i < length  ; i ++ ){
             this.characters[i].setPosition( this.initPos[i]);
             this.characters[i].setIdle();
         }
-        setTimeout( this._openSequence2.bind(this) , 1000);
     }
     _openSequence2(){
         //커튼 치기
@@ -130,6 +141,14 @@ class GameScene extends tt.Node{
         });
        
 
+        let length = this.characters.length;
+        for( let i = 0 ; i < length  ; i ++ ){
+            // characters[i].setPosition( initPos[i][0] , initPos[i][1]);
+            this.characters[i].moveTo(0.5, this.initPos[i][0] , 0);
+        }
+
+
+
         //여기서 캐릭터 셔플 한번 하면 되럭 같음
         for( let i = 0 ; i < this.characters.length ; i ++ ){
             let rnd = Math.floor(Math.random() * this.characters.length );
@@ -137,18 +156,23 @@ class GameScene extends tt.Node{
             this.characters[i] = this.characters[rnd];
             this.characters[rnd] = temp;
         }
-        setTimeout( this._openSequence3.bind(this) , 1000);
+
+
+        // setTimeout( this._openSequence3.bind(this) , 1000);
     }
-    _openSequence3(){
+
+    _openSequence4(){
         let length = this.characters.length;
         for( let i = 0 ; i < length  ; i ++ ){
             // characters[i].setPosition( initPos[i][0] , initPos[i][1]);
-            this.characters[i].moveTo(2, this.gamePos[i][0] , this.gamePos[i][1]);
+            this.characters[i].moveTo(1, this.gamePos[i][0] , this.gamePos[i][1]);
         }
 
-        setTimeout( this._openSequence4.bind(this) , 2000 );
+        // setTimeout( this._openSequence5.bind(this) , 1000 );
     }
-    _openSequence4(){
+
+
+    _openSequence5(){
         this.characters[0].setDearIdle(-1);
         this.characters[1].setDearIdle(-1);
         this.characters[2].setDearIdle();
@@ -159,31 +183,17 @@ class GameScene extends tt.Node{
         this.characters[7].die();
 
         //커튼 젖히기
-
-
-        setTimeout( this._openSequence5.bind(this) , 2000);
-
-    }
-    _openSequence5(){
         this.trees.forEach(element=>{
             element.setVisible(false);
         });
-        //메인 게임 시작
-        function _setMouseEvent(targetCharacter , number ){
-            tt.InputManager.registerMouseDownEvent(targetCharacter , 
-                function(){
-
-                    targetCharacter.swapShader();
-                }
-            );
-        }
-
+        
         this.setFirstNumbers( 3,6);
 
-        // _setMouseEvent( this.characters[0], 3);
-        // _setMouseEvent( this.characters[3], 6);
+
     }
 
+//#endregion
+    
 
     _addLabelToCharacter( targetCharacter, num ){
         let lb = new tt.Label(num.toString());

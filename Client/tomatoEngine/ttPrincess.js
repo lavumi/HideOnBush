@@ -280,6 +280,7 @@ tt.Princess =  class PRCN_Spine extends tt.Node{
             });
         })
     }
+    
     _calculateBounds(skeleton) {
         skeleton.setToSetupPose();
         skeleton.updateWorldTransform();
@@ -289,8 +290,6 @@ tt.Princess =  class PRCN_Spine extends tt.Node{
         offset.y = 0
         return { offset: offset, size: size };
     }
-
-
 
     moveDelta = [];
     targetPosition = [];
