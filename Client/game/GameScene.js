@@ -1,4 +1,4 @@
-class GameScene extends tt.Node{
+class GameScene extends tt.Scene{
 
     characterID = [ 106011,109631 ,102031,103631, 113431,106131,110531,110931];
     classID = [7,2,5,7,29,5,2,2];
@@ -106,7 +106,8 @@ class GameScene extends tt.Node{
             // characters[index].setVisible(false);
         }
         else {
-            self._loadFinishCallback();
+            if ( typeof self._loadFinishCallback === "function")
+                self._loadFinishCallback();
             // self._openSequence1();
             self._runSequence();
         }

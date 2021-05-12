@@ -42,14 +42,15 @@ tt.InputField = class InputField extends tt.Node {
 
     _updateUI( input ){
                 
+        // cc.log('ttInputField.js(44)' , input )
         if (input.indexOf('Key') !== -1 ) {
             // return input.replace('Key', "");
             let character =  input.replace('Key', "");
             this._setString(this.text + character);
         }
         else if ( input.indexOf("Enter") !== -1 ){
-            // console.log("Enter PRessed");
-            if ( typeof enterCallback === "function" ){
+            // console.log("Enter PRessed", typeof this.enterCallback );
+            if ( typeof this.enterCallback === "function" ){
                 this.enterCallback( this.text);
             }
         }
@@ -68,6 +69,10 @@ tt.InputField = class InputField extends tt.Node {
         }
     }
 
+    getString(){
+        return this.text;
+    }
+
     setPosition( pos ){
         this.buffer.setPosition( pos );
     }
@@ -78,6 +83,8 @@ tt.InputField = class InputField extends tt.Node {
 
 
     setEnterCallback( callback ){
+
         this.enterCallback = callback;
+        // cc.log('ttInputField.js(85)' , this.enterCallback )
     }
 }

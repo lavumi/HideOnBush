@@ -1,4 +1,5 @@
 let tt = {};
+let cc = console;
 tt.gameEngine = class LavumiZZANG {
     static #_instance = null;
 
@@ -25,7 +26,7 @@ tt.gameEngine = class LavumiZZANG {
         return this.#_instance;
     }
 
-    Initialize( ){
+    Initialize( initFinishCallback ){
 
         let canvas = document.getElementById("canvas");
         let config = { alpha: false };
@@ -40,12 +41,8 @@ tt.gameEngine = class LavumiZZANG {
         tt.InputManager.Initialize();
         tt.FontRenderer = new FontRenderer();
         tt.FontRenderer.initialize( function(){
-            TextureUtil.loadTexture(function () {
-                // // InitCharacter();
-                // // initInputScene();    
-                self.currentScene = new GameScene( self.startEngine.bind(self));            
-            });}
-        );
+            TextureUtil.loadTexture(initFinishCallback);
+        });
 
     }
 
@@ -54,6 +51,7 @@ tt.gameEngine = class LavumiZZANG {
     }
 
     setScene( scene ){
+        // console.log('tomato.main.js(52)' , scene );
         this.currentScene = scene;
     }
 
@@ -67,6 +65,7 @@ tt.gameEngine = class LavumiZZANG {
         this.lastFrameTime = now;
 
         
+        // cc.log('tomato.main.js(66)' , this.currentScene );
         this.currentScene.update(delta);
         requestAnimationFrame(this.update.bind(this));
 
