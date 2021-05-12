@@ -51,9 +51,8 @@ tt.InputManager = new (class {
                     element.callback();
                     this._currentTarget = element;
                     return;
-                }
+            }
         }
-    
     }
 
 

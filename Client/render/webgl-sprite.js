@@ -10,7 +10,6 @@ var TextureUtil = {
         'Resources/images/ground2.png',
         'Resources/images/bg.png',
         'Resources/images/optionUI.png',
-        'Resources/images/bush.png'
     ],
 
     _glTexture : {},
