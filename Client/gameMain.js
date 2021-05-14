@@ -4,5 +4,4 @@ tt.gameEngine.getInstance().Initialize(
         tt.gameEngine.getInstance().setScene( inputScene);
         tt.gameEngine.getInstance().startEngine();
     }
-
 );

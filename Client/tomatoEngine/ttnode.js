@@ -2,6 +2,7 @@ tt.Node = class {
 
     position = [0,0];
     children = [];
+    _parent = null;
     visible = true;
 
     constructor(){
@@ -19,6 +20,12 @@ tt.Node = class {
 
     addChild( child ){
         this.children.push(child);
+        child._parent = this;
+    }
+
+    removeChild( child ){
+        let index = this.children.indexOf( child );
+        let target = this.children.splice( index, 1);
     }
 
     _update(dt){
@@ -44,6 +51,10 @@ tt.Node = class {
             width : 0,
             height : 0,
         }
+    }
+
+    removeFromParent(){
+        this._parent.removeChild( this );
     }
 
     render(){

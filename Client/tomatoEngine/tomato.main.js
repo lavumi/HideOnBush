@@ -38,6 +38,7 @@ tt.gameEngine = class LavumiZZANG {
 
 
         let self = this;
+        tt.Network = new Socket();
         tt.InputManager.Initialize();
         tt.FontRenderer = new FontRenderer();
         tt.FontRenderer.initialize( function(){
@@ -106,3 +107,5 @@ tt.gameEngine = class LavumiZZANG {
         gl.viewport(0, 0, canvas.width, canvas.height);
     }
 }
+
+tt.Network = null;

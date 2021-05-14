@@ -48,6 +48,16 @@ class GameServer{
             }
         
         });
+
+        this.socket.of("/").adapter.on("leave-room", (room, id) => {
+            // console.log(`socket ${id} has joined room ${room}`);
+            if ( id !== room ){
+                let player = this.userList[ id ]
+                let name = player.userName;
+                this.socket.to(room).emit("leave player" , { id : id , name : name , roomName : room });
+            }
+        
+        });
     }
 
 
@@ -66,6 +76,7 @@ class GameServer{
                         response : able,
                         member : roomMember
                     });
+                    // console.log( "----",roomMember );
                     this.roomList[roomName].enterRoom( this.userList[socket.id] );
                 }
                 

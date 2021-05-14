@@ -30,12 +30,17 @@ class FontBufferBuilder {
                 fontStartPos[0] += 30 / 512;
                 continue;
             }
+            if ( text[i] === "\n" ){
+                fontStartPos[0] = 0;
+                fontStartPos[1] -= 100 / 512;
+                continue;
+            }
             var fontData = allFontData[text[i].toLowerCase()];;
 
             var X = fontData.rect[0] / 512;
             var Y = fontData.rect[1] / 512;
             var offsetX = fontData.offset[0] / 512;
-            var offsetY = fontData.offset[1] / 512
+            var offsetY = fontData.offset[1] / 512;
             var width = fontData.rect[2] / 512;
             var height = fontData.rect[3] / 512;
 
@@ -159,6 +164,10 @@ tt.Label = class Label extends tt.Node {
             this.text = text;
             this.buffer.makeBuffer( this.text );
         }
+    }
+
+    getString(){
+        return this.text;
     }
 
     setPosition( pos ){
