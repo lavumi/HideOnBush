@@ -70,19 +70,66 @@ export default class Room {
 
         this.currentStage = 0;
 
-        
+
+
+        //캐릭터 섞기
+
+        let characters = [0,1,2,3,4,5,6,7];
+        for( let i = 0 ; i < characters.length ; i ++ ){
+            let rnd = Math.floor(Math.random() * characters.length );
+            let temp = characters[i];
+            characters[i] =characters[rnd];
+            characters[rnd] = temp;
+        }
+
+
+
+        //카드 섞기
+        for( let i = 0 ; i < this.cards.length ; i ++ ){
+            let rnd = Math.floor(Math.random() * this.cards.length );
+            let temp = this.cards[i];
+            this.cards[i] = this.cards[rnd];
+            this.cards[rnd] = temp;
+        }
+
         this.members[0].socket.emit('gameStart' , {
+            princess : characters,
             data : this.cards.slice(0 , 2 )
         });
+        console.log( characters );
+
+
+
+
+        let char = characters.shift();
+        characters.splice(3,0,char);
         this.members[1].socket.emit('gameStart' , {
+            princess : characters,
             data : this.cards.slice(1 , 3 )
         });
+        console.log( characters );
+
+
+
+         char = characters.shift();
+        characters.splice(3,0,char);
         this.members[2].socket.emit('gameStart' , {
+            princess : characters,
             data : this.cards.slice(2 , 4 )
         });
+        console.log( characters );
+
+
+
+         char = characters.shift();
+        characters.splice(3,0,char);
         this.members[3].socket.emit('gameStart' , {
+            princess : characters,
             data : [ this.cards[3], this.cards[0]]
         });
+        console.log( characters );
+
+
 
         this.startTurn(this.currentStage);
         this.markCard(4);

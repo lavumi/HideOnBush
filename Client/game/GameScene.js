@@ -1,5 +1,7 @@
 class GameScene extends tt.Scene{
 
+
+    //캬 닌 미 쿄 하 무 카 치
     characterID = [ 106011,109631 ,102031,103631, 113431,106131,110531,110931];
     classID = [7,2,5,7,29,5,2,2];
 
@@ -10,9 +12,9 @@ class GameScene extends tt.Scene{
 
     gamePos = [
         [0,-500],
-        [850,0],
-        [0,300],
         [-850,0],
+        [0,300],
+        [850,0],
         [-150,-165],
         [0,-165],
         [150,-165],
@@ -26,12 +28,19 @@ class GameScene extends tt.Scene{
     characters = [];
     trees = [];
     _loadFinishCallback;
-    constructor( loadFinishCallback ){
+
+    _myCards = [];
+    _princess = [];
+    constructor(  gameData , loadFinishCallback ){
         super();
+
+        cc.log('GameScene.js(33)' , gameData )
+        this._myCards = gameData.data;
+        this._princess = gameData.princess;
+
         this._loadFinishCallback = loadFinishCallback;
         this.InitializeScene();
     }
-
 
     resize( scale ){
         this.characters.forEach(element=>{
@@ -103,6 +112,7 @@ class GameScene extends tt.Scene{
         let self = this;
         if ( index < this.characters.length  ){
             this.characters[index].loadCharacter( this.characterID[index], this.classID[index] , self._loadSpineCharacter.bind(self, index+1));
+            this.characters[index].testIndes__index = index;
             // characters[index].setVisible(false);
         }
         else {
@@ -113,10 +123,10 @@ class GameScene extends tt.Scene{
         }
     }
 
+    //#region [ OPENING SEQUENCE ]
     _sleep( ms ){
         return new Promise( resolve => setTimeout( resolve, ms));
     }
-
     async _runSequence(){
         this._openSequence1();
         await this._sleep( 1000 );
@@ -126,8 +136,6 @@ class GameScene extends tt.Scene{
         await this._sleep(1000);
         this._openSequence5();
     }
-
-    //#region [ OPENING SEQUENCE ]
     _openSequence1(){
         let length = this.characters.length;
         for( let i = 0 ; i < length  ; i ++ ){
@@ -149,19 +157,31 @@ class GameScene extends tt.Scene{
         }
 
 
+        let tempCharArr = this.characters;
 
-        //여기서 캐릭터 셔플 한번 하면 되럭 같음
+
+        this.characters = [];
+
+        this._princess.forEach(element=>{
+            this.characters.push( tempCharArr[element]);
+        })
+        //여기서 캐릭터 셔플 한번 하면 되럭 같음 
+        // for( let i = 0 ; i < this.characters.length ; i ++ ){
+        //     let rnd = this._princess[i];
+        //     let temp = this.characters[i];
+        //     this.characters[i] = this.characters[rnd];
+        //     this.characters[rnd] = temp;
+        // }
+        console.log( this._princess);
+
+
+        let logText = "";
         for( let i = 0 ; i < this.characters.length ; i ++ ){
-            let rnd = Math.floor(Math.random() * this.characters.length );
-            let temp = this.characters[i];
-            this.characters[i] = this.characters[rnd];
-            this.characters[rnd] = temp;
+           logText += this.characters[i].testIndes__index;
+            // console.log();
         }
-
-
-        // setTimeout( this._openSequence3.bind(this) , 1000);
+        console.log(logText);
     }
-
     _openSequence4(){
         let length = this.characters.length;
         for( let i = 0 ; i < length  ; i ++ ){
@@ -171,13 +191,11 @@ class GameScene extends tt.Scene{
 
         // setTimeout( this._openSequence5.bind(this) , 1000 );
     }
-
-
     _openSequence5(){
         this.characters[0].setDearIdle(-1);
-        this.characters[1].setDearIdle(-1);
+        this.characters[1].setDearIdle();
         this.characters[2].setDearIdle();
-        this.characters[3].setDearIdle();
+        this.characters[3].setDearIdle(-1);
         this.characters[4].setIdle();
         this.characters[5].setIdle();
         this.characters[6].setIdle();
@@ -188,9 +206,7 @@ class GameScene extends tt.Scene{
             element.setVisible(false);
         });
         
-        this.setFirstNumbers( 3,6);
-
-
+        this.setFirstNumbers( this._myCards[0], this._myCards[1]);
     }
 
 //#endregion
@@ -213,6 +229,39 @@ class GameScene extends tt.Scene{
 
     setFirstNumbers( num1, num2 ){
         this._addLabelToCharacter( this.characters[0],num1);
-        this._addLabelToCharacter( this.characters[3],num2);
+        this._addLabelToCharacter( this.characters[1],num2);
     }
+
+
+    setGameCallbacks(){
+        tt.Network.on('startTurn', self._startTurn.bind(self ));
+
+        tt.Network.on("suspectChoosed" , (res)=>{
+            console.log("suspectChoosed" , res );
+        })
+
+        tt.Network.on('gameFinished' , ( res )=>{
+            console.log("gameFinished", res );
+        });
+    }
+
+    _startTurn( res ){
+        console.log("start My turn, turncount = ", res);
+        addConsole("Its your turn");
+        addConsole("You checked " + res[0] + " " +res[1]);
+        function checkSuspect(){
+            getInput("select suspect 4,5,6" , function( input ){
+                let inputNum = Number(input);
+                if ( inputNum === 4 || inputNum === 5 || inputNum === 6){
+                    console.log("emit pickSuspect");
+                    self.socket.emit("pickSuspect" , inputNum );
+                }
+                else {
+                    checkSuspect();
+                }
+            })
+        }
+        checkSuspect();
+    }
+
 }

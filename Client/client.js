@@ -6,7 +6,7 @@ class Socket{
     }
 
 
-    connect ( userName ){
+    connect ( userName  , callback ){
         this.socket = io({
             reconnection : false,
             auth :{
@@ -19,6 +19,7 @@ class Socket{
             console.log("connected", res );
             self.connected = true;
             addConsole("Welcome"  );
+            callback();
         });
 
         this.socket.once("disconnect", () => {
@@ -41,7 +42,8 @@ class Socket{
 
 
     emit ( router ,data, callback ){
-        if ( this.connected === false ) return;
+        if ( this.connected === false ) {
+            return;}
         this.socket.emit(router , data, callback );
     }
 

@@ -9,6 +9,8 @@ class InputScene extends tt.Scene{
 
     nameTags = [];
 
+    testMode = true;
+
     constructor(loadFinishCallback){
         super();
         this.uiFrame = new tt.Sprite("optionUI.png");
@@ -42,7 +44,12 @@ class InputScene extends tt.Scene{
         this.addChild(temp);
 
 
-        // this.removeChild( temp);
+        if ( this.testMode ){
+            tt.Network.connect( "lavumi" , function(){
+                self._joinRoom("test1");
+            });
+            // this._joinRoom( "test" );
+        }
     }
 
 
@@ -50,17 +57,20 @@ class InputScene extends tt.Scene{
     setRoomNameInput(){
         this.uiTitle.setString("Input Room Name");
         this.uiInput.setString("");
+        this.uiInput.enable(true);
         // this.removeChild( this.uiTitle);
 
     }
 
 
     inputCallback ( input ){
+        this.uiInput.enable(false);
         switch ( this.inputStage ){
             case 0 : 
-                tt.Network.connect( input );
-                this.inputStage++
-                this.setRoomNameInput();
+                tt.Network.connect( input ,function(){
+                    this.inputStage++
+                    this.setRoomNameInput();
+                }.bind(this));
                 break;
             case 1:
                 this._joinRoom( input );
@@ -75,7 +85,7 @@ class InputScene extends tt.Scene{
         let self = this;
         tt.Network.emit( "join room", roomname , ( res )=>{
             if ( res.response === false ){
-                cc.log('InputScene.js(64)' , "" );
+                cc.log('InputScene.js(64)' , "response fail" );
                 return;
             }
             console.log("joinRoom response", res.member );
@@ -94,15 +104,12 @@ class InputScene extends tt.Scene{
 
             tt.Network.on('gameStart', self._gameStart.bind(self ));
 
-            tt.Network.on('startTurn', self._startTurn.bind(self ));
 
-            tt.Network.on("suspectChoosed" , (res)=>{
-                console.log("suspectChoosed" , res );
-            })
 
-            tt.Network.on('gameFinished' , ( res )=>{
-                console.log("gameFinished", res );
-            })
+
+            //todo 여기서 게임룸 생성을 시작할까...
+
+
         });
     }
 
@@ -134,27 +141,11 @@ class InputScene extends tt.Scene{
  
     _gameStart( res ){
         console.log( res );
-        addConsole("---------  GAME START ---------");
-        addConsole( "Check card : " + res.data[0] + ", " + res.data[1] );
-        stopWaiting();
+        let gameScene = new GameScene( res , function(){
+            tt.gameEngine.getInstance().setScene(  gameScene);
+        });
+
     }
 
-    _startTurn( res ){
-        console.log("start My turn, turncount = ", res);
-        addConsole("Its your turn");
-        addConsole("You checked " + res[0] + " " +res[1]);
-        function checkSuspect(){
-            getInput("select suspect 4,5,6" , function( input ){
-                let inputNum = Number(input);
-                if ( inputNum === 4 || inputNum === 5 || inputNum === 6){
-                    console.log("emit pickSuspect");
-                    self.socket.emit("pickSuspect" , inputNum );
-                }
-                else {
-                    checkSuspect();
-                }
-            })
-        }
-        checkSuspect();
-    }
+
 }
