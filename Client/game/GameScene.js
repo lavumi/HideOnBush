@@ -40,6 +40,7 @@ class GameScene extends tt.Scene{
 
         this._loadFinishCallback = loadFinishCallback;
         this.InitializeScene();
+        this.setGameCallbacks();
     }
 
     resize( scale ){
@@ -49,9 +50,6 @@ class GameScene extends tt.Scene{
     }
 
     InitializeScene(){
-        // let spr = new tt.Sprite("bg.png");
-        // spr.setPosition([-960, -456]);
-        // this.addChild(spr);
 
 
         let spr = new tt.Sprite("ground2.png");
@@ -234,19 +232,24 @@ class GameScene extends tt.Scene{
 
 
     setGameCallbacks(){
+        let self = this;
         tt.Network.on('startTurn', self._startTurn.bind(self ));
-
         tt.Network.on("suspectChoosed" , (res)=>{
             console.log("suspectChoosed" , res );
-        })
-
+        });
         tt.Network.on('gameFinished' , ( res )=>{
             console.log("gameFinished", res );
         });
     }
 
-    _startTurn( res ){
-        console.log("start My turn, turncount = ", res);
+
+    firstTurnSequence(){
+        
+    }
+
+
+    _startTurn( res ){      
+
         addConsole("Its your turn");
         addConsole("You checked " + res[0] + " " +res[1]);
         function checkSuspect(){
@@ -254,7 +257,7 @@ class GameScene extends tt.Scene{
                 let inputNum = Number(input);
                 if ( inputNum === 4 || inputNum === 5 || inputNum === 6){
                     console.log("emit pickSuspect");
-                    self.socket.emit("pickSuspect" , inputNum );
+                    tt.Network.emit("pickSuspect" , inputNum );
                 }
                 else {
                     checkSuspect();

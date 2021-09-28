@@ -96,9 +96,6 @@ export default class Room {
             princess : characters,
             data : this.cards.slice(0 , 2 )
         });
-        console.log( characters );
-
-
 
 
         let char = characters.shift();
@@ -107,8 +104,6 @@ export default class Room {
             princess : characters,
             data : this.cards.slice(1 , 3 )
         });
-        console.log( characters );
-
 
 
          char = characters.shift();
@@ -117,9 +112,6 @@ export default class Room {
             princess : characters,
             data : this.cards.slice(2 , 4 )
         });
-        console.log( characters );
-
-
 
          char = characters.shift();
         characters.splice(3,0,char);
@@ -127,7 +119,7 @@ export default class Room {
             princess : characters,
             data : [ this.cards[3], this.cards[0]]
         });
-        console.log( characters );
+
 
 
 
